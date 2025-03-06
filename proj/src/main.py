@@ -95,7 +95,7 @@ def is_wired(cell: Cell, map: Map):
   return cell in map.wired
 
 def is_backbone(cell: Cell, map: Map):
-  return cell.x == map.backbone.cell.x and cell.y == map.backbone.cell.y
+  return cell == map.backbone.cell
 
 def parse(file):
   with open(file, "r") as f:
@@ -130,7 +130,7 @@ def bfs(map: Map, start: Cell, target: Cell):
 
   while queue:
     current_cell, path = queue.popleft()
-    if current_cell.x == target.x and current_cell.y == target.y:
+    if current_cell == target:
       return path
     
     for adj in adjacents(current_cell):
