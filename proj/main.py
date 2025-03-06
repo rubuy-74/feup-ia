@@ -1,3 +1,5 @@
+import sys
+
 class Position:
   def __init__(self, x, y):
     self.x = x
@@ -18,10 +20,9 @@ class Backbone:
   def __str__(self):
     return "[" + str(self.position) + ", " + str(self.cost) + ", " + str(self.connected_to) + "]"  
 class Map:
-  def __init__(self, rows, columns, routers, walls, voids, targets, backbone, budget):
+  def __init__(self, rows, columns, walls, voids, targets, backbone, budget):
       self.rows = rows
       self.columns = columns
-      self.routers = routers
       self.walls = walls
       self.voids = voids
       self.targets = targets
@@ -29,16 +30,15 @@ class Map:
       self.budget = budget
 
   def __str__(self):
-    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.routers) + ", " + str(self.backbone) + ", " + str(self.walls) + ", " + str(self.voids) + ", " + str(self.targets) + ", " + str(self.budget) +  "]"
+    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.backbone) + ", " + str(self.walls) + ", " + str(self.voids) + ", " + str(self.targets) + ", " + str(self.budget) +  "]"
 class Router:
   def __init__(self, pos, range_, cost):
     self.position = pos
     self.range_ = range_
     self.cost = cost
 
-
-def main():
-  with open("opera.in", "r") as f:
+def parse(file):
+  with open(file, "r") as f:
     lines = f.readlines()
   
     rows, columns, range_ = lines[0].split(" ")
@@ -61,9 +61,11 @@ def main():
           case "#":
             walls.append(pos)
 
-    map = Map(rows, columns, [], walls, voids, targets, backbone, budget)
-    
-    print(map)
+    return Map(rows, columns, walls, voids, targets, backbone, budget)
+
+def main():
+  map = parse(sys.argv[1])
+  print(map)
 
 
 if __name__ == "__main__":
