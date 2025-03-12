@@ -1,7 +1,24 @@
 <!-- # IART 2024 - Router Placement -->
 ## Specification of the Problem
 
+Typically, buildings are connected to the Internet using a fiber backbone. In order to provide wireless Internet access, wireless routers are placed around the building and connected using fiber cables to the backbone.
+
+Given a building plan, the objective is to decide where to put wireless router and how to connect them to the fiber backbone to maximize coverage and minimize cost (not surpassing the budget).
+
+The problem is represented as grid, where each cell can be either a wall cell, a target cell or a void cell. Target cells are cells in which we need to have wireless coverage and the void cells don't need to be covered.
+
+Routers have a limited square of coverage and cannot be placed in wall cells. Backbones in the other hand can be placed anywhere on the grid.
+
 ## Related Work
+
+These are related research and solutions to the problem at hand:
+
++ Principled Modeling of the Google Hash Code Problems for Meta-Heuristics
+  + https://estudogeral.uc.pt/retrieve/265403/tese_final_pedro_rodrigues.pdf
++ Genetic algorithms and greedy-randomized adaptive search procedure for router placement problem in wireless networks
+  + https://journals.sagepub.com/doi/full/10.3233/JHS-190616
++ Teams Gyrating Flibbittygibbitts solution
+  + https://github.com/sbrodehl/HashCode
 
 ## Problem Formulation
 
@@ -10,7 +27,7 @@
 + Array of array containing the path for each router
 + Number of non router cells connected to the backbone (N)
 + Number of routers (M)
-+ Number of targeted cells (t)
++ Number of targeted cells covered (t)
 
 #### Mutation Function
 
@@ -26,7 +43,7 @@
 
 #### Hard Constraints
 
-+ A router must be placed within the boundaries of the grid
++ A router must be placed within the boundaries of the walls
 + There is no wall inside the smallest enclosing rectangle of a cell with a router and a cell that is covered
 + Routers can only be connected to a cell that is already connected to the fiber backbone
 + The maximum spend on routers and backbone is B
@@ -51,8 +68,11 @@ Pr - price of connecting a router to the backbone
 
 ### Data Structures
 
-+ Backbone
-+ Map
++ Grid
 + Router
 + Solution
 + Position
+
+### Current Solutions
+
++ Greedy - using the closest possible target cell where there is no coverage from another router
