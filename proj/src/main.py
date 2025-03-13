@@ -74,14 +74,14 @@ def greedy(map: Map, router_cost, router_range):
 
 def main():
   map = utils.parse(sys.argv[1])
-  # sol = greedy(map, router_cost, router_range)
-  sol = randomSolution.randomSolution(map)
-  print(map.evaluate(sol))
-  print(sol)
+  # sol = greedySolution.greedySolution(map)
+  # sol = randomSolution.randomSolution(map)
+  # print(map.evaluate(sol))
+  # print(sol)
 
   solGreedy = greedySolution.greedySolution(map)
   print(map.evaluate(solGreedy))
-  print(solGreedy)
+  # print(solGreedy)
 
 
 if __name__ == "__main__":

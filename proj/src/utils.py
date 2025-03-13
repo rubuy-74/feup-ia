@@ -51,7 +51,7 @@ def getRouterTargets(routerCell: cell.Cell,routerRange: int,walls: list[cell.Cel
   targets = []
   for i in range(0,routerRange):
     for j in range(0,routerRange):
-      if(i == 0 and j == 0): continue
+      if((i == 0 and j == 0) or i == j): continue
       x = routerCell.x + i
       y = routerCell.y + j
       if cell.Cell(x,y) not in walls:
@@ -61,12 +61,3 @@ def getRouterTargets(routerCell: cell.Cell,routerRange: int,walls: list[cell.Cel
 def calculateTargets(routers : list[router.Router]) -> int:
   targetList : list[int] = list(map(lambda router: len(router.targets),routers))
   return sum(targetList)
-
-# TODO: Wall check costs a lot
-def getWallRange(range_: int, x:int,y:int, walls: list[cell.Cell]) -> list[cell.Cell]:
-  rWalls = []
-  for i in range(range_):
-    for j in range(range_):
-      if(cell.Cell(x+i,y+j) not in walls):
-        rWalls.append(cell.Cell(x+i,y+j))
-  return rWalls
