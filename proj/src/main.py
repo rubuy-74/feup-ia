@@ -88,9 +88,11 @@ def main():
 
   for i in range(0,m.rows):
     for j in range(0,m.columns):
-      newCell = cell.Cell(i,j)
+      newCell = cell.Cell(j,i)
       if(newCell in routerCells):
         print("r",end="")
+      elif newCell == m.backbone.cell:
+        print("b",end="")
       elif newCell in targets:
         print("x",end="")
       elif m.isWall(newCell):

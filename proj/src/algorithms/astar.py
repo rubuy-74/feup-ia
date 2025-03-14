@@ -42,7 +42,7 @@ def astar(map : classMap.Map, start : cell.Cell, end : cell.Cell):
         
         closedSet.add(currentNode.position)
         for neighbor in nonWallAdjacent(map,currentNode.position):
-            if (0 <= neighbor.x < map.rows) and (0 <= neighbor.y < map.columns):
+            if (0 <= neighbor.x < map.columns) and (0 <= neighbor.y < map.rows):
                 if neighbor in closedSet:
                     continue
 
