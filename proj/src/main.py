@@ -1,4 +1,6 @@
 import sys
+import pygame
+import ctypes
 import utils as utils
 import algorithms.randomSolution as randomSolution
 import algorithms.greedySolution as greedySolution
@@ -73,15 +75,124 @@ def greedy(map: Map, router_cost, router_range):
  """
 
 def main():
-  map = utils.parse(sys.argv[1])
-  # sol = greedySolution.greedySolution(map)
-  # sol = randomSolution.randomSolution(map)
-  # print(map.evaluate(sol))
-  # print(sol)
+  pygame.init()
 
-  solGreedy = greedySolution.greedySolution(map)
-  print(map.evaluate(solGreedy))
-  # print(solGreedy)
+  map = None
+  state = 'MENU'
+  title_text = 'Hello, choose the file!'
+  texts = ['Simple Example', 'Charleston Road', 'Lets Go Higher', 'Opera', 'Rue De Londres']
+  file_options = ['example.in', 'charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
+  algorithms = ['Random', 'Greedy', 'Hill Climbing', 'Simulated Annealing', 'Tabu Search', 'Genetic Algorithm']
+
+
+  choice_map = 0
+
+  choice_alg = 0
+
+  font = pygame.font.SysFont(None, 55)
+
+  screen = pygame.display.set_mode((1000, 900))
+  pygame.display.set_caption('Router Placement')
+
+  hwnd = pygame.display.get_wm_info()['window']
+
+  # Move the window to the top-left corner
+  ctypes.windll.user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0)
+
+
+  title = font.render(title_text, True, (255, 255, 255))
+
+  running = True
+  while running:
+    for event in pygame.event.get():
+      if state == 'MENU':
+        if event.type == pygame.QUIT:
+          running = False
+        elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_ESCAPE:
+            running = False
+          elif event.key == pygame.K_DOWN:
+            choice_map = (choice_map + 1) % len(texts)
+          elif event.key == pygame.K_UP:
+            choice_map = (choice_map - 1) % len(texts)
+          elif event.key == pygame.K_RETURN:
+            path = "../maps/"+file_options[choice_map]
+            map = utils.parse(path)
+            state = 'ALGCHOICE'
+      elif state == 'ALGCHOICE':
+        if event.type == pygame.QUIT:
+          running = False
+        elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_ESCAPE:
+            state = 'MENU'
+          elif event.key == pygame.K_DOWN:
+            choice_alg = (choice_alg + 1) % len(algorithms)
+          elif event.key == pygame.K_UP:
+            choice_alg = (choice_alg - 1) % len(algorithms)
+          elif event.key == pygame.K_RETURN:
+            state = 'ALGORITHM'
+      elif state == 'ALGORITHM':
+        if(choice_alg == 0):
+          solRandom = randomSolution.randomSolution(map)
+          print(map.evaluate(solRandom))
+          running = False
+        elif(choice_alg == 1):
+          solGreedy = greedySolution.greedySolution(map)
+          print(map.evaluate(solGreedy))
+          running = False
+        else:
+          state = 'NOT_IMPLEMENTED'
+      elif state == 'NOT_IMPLEMENTED':
+        if event.type == pygame.QUIT:
+          running = False
+        elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_ESCAPE:
+            state = 'ALGCHOICE'
+
+    
+    # print(solGreedy)
+    if state == 'MENU':
+        # Fill the screen with black
+        screen.fill((0, 0, 0))
+
+        # Draw the title on the screen
+        screen.blit(title, (10, 50))
+
+        # Draw the options on the screen
+        y = 150
+        for i, text in enumerate(texts):
+            color = (255, 255, 255) if i != choice_map else (255, 0, 0)
+            rendered_text = font.render(text, True, color)
+            screen.blit(rendered_text, (10, y))
+            y += 60  # Adjust the y position for the next text
+
+        # Update the display
+        pygame.display.flip()
+
+    elif state == 'ALGCHOICE':
+        # Fill the screen with black
+        screen.fill((0, 0, 0))
+
+        # Draw the title on the screen
+        screen.blit(title, (10, 50))
+
+        # Draw the options on the screen
+        y = 150
+        for i, text in enumerate(algorithms):
+            color = (255, 255, 255) if i != choice_alg else (255, 0, 0)
+            rendered_text = font.render(text, True, color)
+            screen.blit(rendered_text, (10, y))
+            y += 60  # Adjust the y position for the next text
+
+        # Update the display
+        pygame.display.flip()
+    
+    elif state == 'NOT_IMPLEMENTED':
+      screen.fill((0, 0, 0))
+      text = font.render('Not implemented yet', True, (255, 0, 0))
+      screen.blit(text, (10, 50))
+      pygame.display.flip()
+        
 
 
 if __name__ == "__main__":
