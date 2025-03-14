@@ -72,17 +72,34 @@ def greedy(map: Map, router_cost, router_range):
   return solution
  """
 
+import models.cell as cell
+import models.map as mapClass
+import models.router as router
+
 def main():
-  map = utils.parse(sys.argv[1])
-  # sol = greedySolution.greedySolution(map)
-  # sol = randomSolution.randomSolution(map)
-  # print(map.evaluate(sol))
-  # print(sol)
+  m: mapClass.Map = utils.parse(sys.argv[1])
 
-  solGreedy = greedySolution.greedySolution(map)
-  print(map.evaluate(solGreedy))
-  # print(solGreedy)
+  sol = greedySolution.greedySolution(m)
+  print(sol)
+  print(m.evaluate(sol))
 
+  targets = sol.getTargets()
+  routerCells = list(map(lambda router: router.cell,sol.routers))
+
+  for i in range(0,m.rows):
+    for j in range(0,m.columns):
+      newCell = cell.Cell(i,j)
+      if(newCell in routerCells):
+        print("r",end="")
+      elif newCell in targets:
+        print("x",end="")
+      elif m.isWall(newCell):
+        print("w",end="")
+      elif m.isVoid(newCell):
+        print("-",end="")
+      else:
+        print(" ",end="")
+    print()
 
 if __name__ == "__main__":
   main()

@@ -20,7 +20,7 @@ def findRouterCell(map: mapClass.Map, routers: list[router.Router]) -> cell.Cell
   while queue:
     possible_cell = queue.popleft()
 
-    if not map.isWall(possible_cell) and not map.isBackbone(possible_cell) and not map.isWired(possible_cell) and not map.isVoid(possible_cell) and router.Router(possible_cell, 0, 0, []) not in routers:
+    if not map.isWall(possible_cell) and not map.isBackbone(possible_cell) and not map.isWired(possible_cell) and not map.isVoid(possible_cell) and router.Router(possible_cell, 0, 0, map) not in routers:
       return possible_cell
     
     for adj in possible_cell.adjacents():
@@ -38,10 +38,8 @@ def greedySolution(map : mapClass.Map) -> solution.Solution:
     
     if routerCell is None:
       break
-    
-    rWalls = utils.getWallRange(map.rRange,routerCell.x,routerCell.y,map.walls)
 
-    r = router.Router(routerCell,map.rRange,map.rtPrice,rWalls)
+    r = router.Router(routerCell,map.rRange,map.rtPrice,map)
     
     tempPath = getPath(map=map,r=r)
     

@@ -1,7 +1,6 @@
 import models.backbone as backbone
 import models.cell as cell
 import models.map as mapClass
-import models.router as router
 
 def parse(file):
   with open(file, "r") as f:
@@ -40,24 +39,42 @@ def parse(file):
       rRange=int(range_)
     )
 
-def getPathsLength(paths : dict) -> int:
-  values = []
-  for _,v in paths.items():
-    values.append(len(v))
-  return sum(values)
+def checkCoverage(w: cell.Cell, routerCell: cell.Cell, compareCell : cell.Cell) -> bool:
+  # just to be sure
+  if(w.y == routerCell.y and w.x == routerCell.x):
+    return False
+  # Left up
+  if w.y <= routerCell.y and w.x <= routerCell.x:
+    result = compareCell.y > w.y or compareCell.x > w.x
+    return result
+  # Right up
+  if w.y >= routerCell.y and w.x <= routerCell.x:
+    result = compareCell.y < w.y or compareCell.x > w.x
+    return result
+  # Left down
+  if w.y <= routerCell.y and w.x >= routerCell.x:
+    result = compareCell.y > w.y or compareCell.x < w.x
+    return result
+  # Right down
+  if w.y >= routerCell.y and w.y >= routerCell.y:
+    result = compareCell.y < w.y or compareCell.x < w.x
+    return result
 
-def getRouterTargets(routerCell: cell.Cell,routerRange: int,walls: list[cell.Cell]) -> list[cell.Cell]:
-  # TODO: MISSING IMPLEMENTATION
+  return True
+  
+def checkWalls(newCell : cell.Cell,routerCell : cell.Cell, walls: list[cell.Cell]) -> bool:
+  for x in walls:
+    if(not checkCoverage(x,routerCell,newCell)): 
+      return False
+  return True
+
+def getTargets(routerCell : cell.Cell,map : mapClass.Map) -> list[cell.Cell]:
   targets = []
-  for i in range(0,routerRange):
-    for j in range(0,routerRange):
-      if((i == 0 and j == 0) or i == j): continue
-      x = routerCell.x + i
-      y = routerCell.y + j
-      if cell.Cell(x,y) not in walls:
-        targets.append(cell.Cell(x,y))
-  return targets
+  walls = map.getWallRange(routerCell)
 
-def calculateTargets(routers : list[router.Router]) -> int:
-  targetList : list[int] = list(map(lambda router: len(router.targets),routers))
-  return sum(targetList)
+  for i in range(-map.rRange,map.rRange+1):
+    for j in range(-map.rRange,map.rRange+1):
+        newCell = cell.Cell(routerCell.x + i, routerCell.y + j)
+        if(checkWalls(newCell,routerCell,walls)):
+          targets.append(newCell) 
+  return targets

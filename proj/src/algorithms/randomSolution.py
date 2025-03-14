@@ -11,12 +11,10 @@ def placeRouter(map : mapClass.Map ) -> router.Router:
   while (True): 
     x = random.randint(0,map.columns)
     y = random.randint(0,map.rows)
-    c = cell.Cell(x,y)
+    routerCell = cell.Cell(x,y)
 
-    if checkValidRouter(map=map,cell=c):
-      # walls within the router range
-      rWalls = utils.getWallRange(map.rRange,x,y,map.walls)
-      return router.Router(c, map.rRange,map.rtPrice,rWalls)
+    if checkValidRouter(map=map,cell=routerCell):
+      return router.Router(routerCell,map.rRange,map.rtPrice,map)
 
 def checkValidRouter(map: mapClass.Map, cell:cell.Cell) -> bool:
   return map.isTarget(cell=cell)

@@ -2,7 +2,6 @@ import models.cell as cell
 import models.backbone as backbone
 import models.solution as solution
 
-
 class Map:
   def __init__(self, 
               rows : int, 
@@ -53,9 +52,10 @@ class Map:
 
   def getWallRange(self,routerCell : cell.Cell) -> list[cell.Cell]:
     walls = []
-    for i in range(-self.rRange,self.rRange):
-      for j in range(-self.rRange,self.rRange):
+    for i in range(-self.rRange,self.rRange+1):
+      for j in range(-self.rRange,self.rRange+1):
+        if(i == 0 and j == 0): continue
         newCell = cell.Cell(routerCell.x + i, routerCell.y + j)
-        if (0 <= newCell.x < self.columns) and (0 <= newCell.y < self.rows) and self.isWall(newCell):
+        if self.isWall(newCell):
           walls.append(newCell)
     return walls
