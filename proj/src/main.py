@@ -74,15 +74,35 @@ def greedy(map: Map, router_cost, router_range):
   return solution
  """
 
+import models.cell as cell
+import models.map as mapClass
+import models.router as router
+
+
+def draw_pixel(screen, x, y, color):
+    pygame.draw.rect(screen, color, (x, y, 1, 1))
+
+def draw_pixel_resize(screen, x, y, color):
+    pygame.draw.rect(screen, color, (x*2, y*2, 2, 2))
+
 def main():
   pygame.init()
 
-  map = None
+  m : mapClass.Map
   state = 'MENU'
   title_text = 'Hello, choose the file!'
   texts = ['Simple Example', 'Charleston Road', 'Lets Go Higher', 'Opera', 'Rue De Londres']
   file_options = ['example.in', 'charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
   algorithms = ['Random', 'Greedy', 'Hill Climbing', 'Simulated Annealing', 'Tabu Search', 'Genetic Algorithm']
+
+
+
+  void = (0, 0, 0)
+  wall = (128, 128, 128)
+  target = (255, 255, 0)
+  target_router = (0, 255, 0)
+  backbone = (255, 0, 0)
+  router = (0, 0, 255)
 
 
   choice_map = 0
@@ -102,6 +122,8 @@ def main():
 
   title = font.render(title_text, True, (255, 255, 255))
 
+  
+
   running = True
   while running:
     for event in pygame.event.get():
@@ -116,8 +138,9 @@ def main():
           elif event.key == pygame.K_UP:
             choice_map = (choice_map - 1) % len(texts)
           elif event.key == pygame.K_RETURN:
+            pygame.display.set_caption('Router Placement - ' + texts[choice_map])
             path = "../maps/"+file_options[choice_map]
-            map = utils.parse(path)
+            m = utils.parse(path)
             state = 'ALGCHOICE'
       elif state == 'ALGCHOICE':
         if event.type == pygame.QUIT:
@@ -130,24 +153,73 @@ def main():
           elif event.key == pygame.K_UP:
             choice_alg = (choice_alg - 1) % len(algorithms)
           elif event.key == pygame.K_RETURN:
+            pygame.display.set_caption('Router Placement - ' + texts[choice_map] + ' - ' +algorithms[choice_alg])
+            screen.fill((0, 0, 0))
+            pygame.display.flip()
             state = 'ALGORITHM'
       elif state == 'ALGORITHM':
         if(choice_alg == 0):
-          solRandom = randomSolution.randomSolution(map)
-          print(map.evaluate(solRandom))
-          running = False
+          sol = randomSolution.randomSolution(m)
+          print(sol)
+          print(m.evaluate(sol))
+          state = 'ALGCHOICE'
+
         elif(choice_alg == 1):
-          solGreedy = greedySolution.greedySolution(map)
-          print(map.evaluate(solGreedy))
-          running = False
+          sol = greedySolution.greedySolution(m)
+          print(sol)
+          print(m.evaluate(sol))
+          targets = sol.getTargets()
+          routerCells = list(map(lambda router: router.cell,sol.routers))
+          print("Screen Blackout")
+          screen.fill((0, 0, 0))
+          print("Drawing")
+
+
+          for i in range(0,m.rows):
+            for j in range(0,m.columns):
+              newCell = cell.Cell(i,j)
+              if(newCell in routerCells):
+                draw_pixel_resize(screen, i, j, router)
+                print("r",end="")
+              elif newCell in targets:
+                draw_pixel_resize(screen, i, j, target_router)
+                print("x",end="")
+              elif m.isWall(newCell):
+                draw_pixel_resize(screen, i, j, wall)
+                print("w",end="")
+              elif m.isVoid(newCell):
+                draw_pixel_resize(screen, i, j, void)
+                print("-",end="")
+              else:
+                draw_pixel_resize(screen, i, j, target)
+                print(" ",end="")
+
+            print()
+          pygame.display.flip()
+          state = 'FROZEN'
+          print("Done")
+
+
         else:
           state = 'NOT_IMPLEMENTED'
+        for event in pygame.event.get():
+          if event.type == pygame.QUIT:
+            running = False
+          elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+              running = False
       elif state == 'NOT_IMPLEMENTED':
         if event.type == pygame.QUIT:
           running = False
         elif event.type == pygame.KEYDOWN:
           if event.key == pygame.K_ESCAPE:
             state = 'ALGCHOICE'
+      elif state == 'FROZEN':
+        if event.type == pygame.QUIT:
+          running = False
+        elif event.type == pygame.KEYDOWN:
+          if event.key == pygame.K_ESCAPE:
+            running = False
 
     
     # print(solGreedy)
@@ -192,8 +264,15 @@ def main():
       text = font.render('Not implemented yet', True, (255, 0, 0))
       screen.blit(text, (10, 50))
       pygame.display.flip()
+
+
+    elif state == 'FROZEN':
+      pygame.display.flip()
+          
         
 
+
+  
 
 if __name__ == "__main__":
   main()
