@@ -4,6 +4,7 @@ import ctypes
 import utils as utils
 import algorithms.randomSolution as randomSolution
 import algorithms.greedySolution as greedySolution
+import models.solution as solution
 
 """ def find_nearest_available_cell_to_router(map: Map, routers: list):
   queue = collections.deque([map.backbone.cell])
@@ -97,6 +98,34 @@ def draw_map(screen, m: mapClass.Map, size):
   pygame.display.flip()
   print("Map Drawn")
 
+
+def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
+  void = (0, 0, 0)
+  wall = (128, 128, 128)
+  target = (255, 255, 0)
+  target_router = (0, 255, 0)
+  backbone = (255, 0, 0)
+  router = (0, 0, 255)
+  targets = sol.getTargets()
+  routerCells = list(map(lambda router: router.cell, sol.routers))
+  print("Screen Blackout")
+  screen.fill((0, 0, 0))
+  print("Drawing")
+
+  for t in m.targets:
+    draw_pixel(screen, t.x, t.y, target, size)
+  for n in targets:
+    draw_pixel(screen, n.x, n.y, target_router, size)
+  for w in m.walls:
+    draw_pixel(screen, w.x, w.y, wall, size)
+  for v in m.voids:
+    draw_pixel(screen, v.x, v.y, void, size)
+  for r in routerCells:
+    draw_pixel(screen, r.x, r.y, router, size)
+
+  pygame.display.flip()
+
+
 def main():
   pygame.init()
 
@@ -113,12 +142,7 @@ def main():
 
 
 
-  void = (0, 0, 0)
-  wall = (128, 128, 128)
-  target = (255, 255, 0)
-  target_router = (0, 255, 0)
-  backbone = (255, 0, 0)
-  router = (0, 0, 255)
+
 
 
   choice_map = 0
@@ -156,7 +180,7 @@ def main():
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map])
             if(choice_map == 0):
-              size = 10
+              size = 30
             elif choice_map == 1:
              size = 2
             else:
@@ -192,24 +216,9 @@ def main():
           sol = greedySolution.greedySolution(m)
           print(sol)
           print(m.evaluate(sol))
-          targets = sol.getTargets()
-          routerCells = list(map(lambda router: router.cell,sol.routers))
-          print("Screen Blackout")
-          screen.fill((0, 0, 0))
-          print("Drawing")
 
-          for t in m.targets:
-            draw_pixel(screen, t.x, t.y, target, size)
-          for n in targets:
-            draw_pixel(screen, n.x, n.y, target_router, size)
-          for w in m.walls:
-            draw_pixel(screen, w.x, w.y, wall, size)
-          for v in m.voids:
-            draw_pixel(screen, v.x, v.y, void, size)
-          for r in routerCells:
-            draw_pixel(screen, r.x, r.y, router, size)
+          draw_solution(screen, m, sol, size)
           
-          pygame.display.flip()
           state = 'FROZEN'
           print("Done")
           out.close()
