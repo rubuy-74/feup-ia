@@ -79,24 +79,21 @@ import models.map as mapClass
 import models.router as router
 
 
-def draw_pixel(screen, x, y, color):
-    pygame.draw.rect(screen, color, (x, y, 1, 1))
-
-def draw_pixel_resize(screen, x, y, color):
-    pygame.draw.rect(screen, color, (x*2, y*2, 2, 2))
+def draw_pixel(screen, x, y, color, size):
+    pygame.draw.rect(screen, color, (x*size, y*size, size, size))
 
 
-def draw_map(screen, m: mapClass.Map):
+def draw_map(screen, m: mapClass.Map, size):
   void = (0, 0, 0)
   wall = (128, 128, 128)
   target = (255, 255, 0)
 
   for i in m.walls:
-    draw_pixel_resize(screen, i.x, i.y, wall)
+    draw_pixel(screen, i.x, i.y, wall, size)
   for i in m.voids:
-    draw_pixel_resize(screen, i.x, i.y, void)
+    draw_pixel(screen, i.x, i.y, void, size)
   for i in m.targets:
-    draw_pixel_resize(screen, i.x, i.y, target)
+    draw_pixel(screen, i.x, i.y, target, size)
   pygame.display.flip()
   print("Map Drawn")
 
@@ -104,6 +101,8 @@ def main():
   pygame.init()
 
   out = open("output.txt", "w")
+
+  size = 1
 
   m : mapClass.Map
   state = 'MENU'
@@ -156,6 +155,12 @@ def main():
             choice_map = (choice_map - 1) % len(texts)
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map])
+            if(choice_map == 0):
+              size = 10
+            elif choice_map == 1:
+             size = 2
+            else:
+              size = 1
             path = "../maps/"+file_options[choice_map]
             m = utils.parse(path)
             state = 'ALGCHOICE'
@@ -172,7 +177,7 @@ def main():
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map] + ' - ' +algorithms[choice_alg])
             screen.fill((0, 0, 0))
-            draw_map(screen, m)
+            draw_map(screen, m, size)
             pygame.display.flip()
             state = 'ALGORITHM'
       elif state == 'ALGORITHM':
@@ -183,7 +188,7 @@ def main():
           state = 'ALGCHOICE'
 
         elif(choice_alg == 1):
-          draw_map(screen, m)
+          draw_map(screen, m, size)
           sol = greedySolution.greedySolution(m)
           print(sol)
           print(m.evaluate(sol))
@@ -193,33 +198,17 @@ def main():
           screen.fill((0, 0, 0))
           print("Drawing")
 
-
-          for j in range(0,m.rows):
-            for i in range(0,m.columns):
-              newCell = cell.Cell(i,j)
-              if(newCell in routerCells):
-                draw_pixel_resize(screen, i, j, router)
-                print("r",end="")
-                out.write("r")
-              elif newCell in targets:
-                draw_pixel_resize(screen, i, j, target_router)
-                print("x",end="")
-                out.write("x")
-              elif m.isWall(newCell):
-                draw_pixel_resize(screen, i, j, wall)
-                print("w",end="")
-                out.write("w")
-              elif m.isVoid(newCell):
-                draw_pixel_resize(screen, i, j, void)
-                print("-",end="")
-                out.write("-")
-              else:
-                draw_pixel_resize(screen, i, j, target)
-                print(" ",end="")
-                out.write(" ")
-
-            print()
-            out.write("\n")
+          for t in m.targets:
+            draw_pixel(screen, t.x, t.y, target, size)
+          for n in targets:
+            draw_pixel(screen, n.x, n.y, target_router, size)
+          for w in m.walls:
+            draw_pixel(screen, w.x, w.y, wall, size)
+          for v in m.voids:
+            draw_pixel(screen, v.x, v.y, void, size)
+          for r in routerCells:
+            draw_pixel(screen, r.x, r.y, router, size)
+          
           pygame.display.flip()
           state = 'FROZEN'
           print("Done")
