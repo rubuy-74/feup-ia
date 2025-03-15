@@ -85,8 +85,25 @@ def draw_pixel(screen, x, y, color):
 def draw_pixel_resize(screen, x, y, color):
     pygame.draw.rect(screen, color, (x*2, y*2, 2, 2))
 
+
+def draw_map(screen, m: mapClass.Map):
+  void = (0, 0, 0)
+  wall = (128, 128, 128)
+  target = (255, 255, 0)
+
+  for i in m.walls:
+    draw_pixel_resize(screen, i.x, i.y, wall)
+  for i in m.voids:
+    draw_pixel_resize(screen, i.x, i.y, void)
+  for i in m.targets:
+    draw_pixel_resize(screen, i.x, i.y, target)
+  pygame.display.flip()
+  print("Map Drawn")
+
 def main():
   pygame.init()
+
+  out = open("output.txt", "w")
 
   m : mapClass.Map
   state = 'MENU'
@@ -155,6 +172,7 @@ def main():
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map] + ' - ' +algorithms[choice_alg])
             screen.fill((0, 0, 0))
+            draw_map(screen, m)
             pygame.display.flip()
             state = 'ALGORITHM'
       elif state == 'ALGORITHM':
@@ -165,6 +183,7 @@ def main():
           state = 'ALGCHOICE'
 
         elif(choice_alg == 1):
+          draw_map(screen, m)
           sol = greedySolution.greedySolution(m)
           print(sol)
           print(m.evaluate(sol))
@@ -175,29 +194,36 @@ def main():
           print("Drawing")
 
 
-          for i in range(0,m.rows):
-            for j in range(0,m.columns):
+          for j in range(0,m.rows):
+            for i in range(0,m.columns):
               newCell = cell.Cell(i,j)
               if(newCell in routerCells):
                 draw_pixel_resize(screen, i, j, router)
                 print("r",end="")
+                out.write("r")
               elif newCell in targets:
                 draw_pixel_resize(screen, i, j, target_router)
                 print("x",end="")
+                out.write("x")
               elif m.isWall(newCell):
                 draw_pixel_resize(screen, i, j, wall)
                 print("w",end="")
+                out.write("w")
               elif m.isVoid(newCell):
                 draw_pixel_resize(screen, i, j, void)
                 print("-",end="")
+                out.write("-")
               else:
                 draw_pixel_resize(screen, i, j, target)
                 print(" ",end="")
+                out.write(" ")
 
             print()
+            out.write("\n")
           pygame.display.flip()
           state = 'FROZEN'
           print("Done")
+          out.close()
 
 
         else:

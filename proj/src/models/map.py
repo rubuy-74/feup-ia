@@ -47,15 +47,7 @@ class Map:
 
   def evaluate(self,solution: solution.Solution) -> int:
     print("Targeted cells: " + str(solution.t))
-    print("BB cells: " + str(solution.n))
-    print("Router cells: " + str(solution.m))
-    return 1000 * solution.t + ( self.budget - ( solution.n * self.bbPrice + solution.m * self.rtPrice ) )
-
-  def getWallRange(self,routerCell : cell.Cell) -> list[cell.Cell]:
-    walls = []
-    for i in range(-self.rRange,self.rRange):
-      for j in range(-self.rRange,self.rRange):
-        newCell = cell.Cell(routerCell.x + i, routerCell.y + j)
-        if (0 <= newCell.x < self.columns) and (0 <= newCell.y < self.rows) and self.isWall(newCell):
-          walls.append(newCell)
-    return walls
+    print("BB cells: " + str(solution.m))
+    print("Cost: " + str(solution.m * self.bbPrice + solution.n * self.rtPrice))
+    print("Router cells: " + str(solution.n))
+    return 1000 * solution.t + ( self.budget - ( solution.m * self.bbPrice + solution.n * self.rtPrice ) )
