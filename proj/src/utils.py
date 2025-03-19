@@ -13,7 +13,7 @@ def parse(file):
     t = set() # testing with sets for O(1)
     v = set()
     w = set()
-    b = backbone.Backbone(cell.Cell(int(bx), int(by)), int(bb_cost), [])
+    b = backbone.Backbone(cell.Cell(int(bx), int(by)), int(bb_cost), set())
     
     for i, line in enumerate(lines[3:]):
       for j, c in enumerate(line):
@@ -46,7 +46,6 @@ def checkOutsideWallArea(cell: cell.Cell, rules: list[tuple]):
     # 3 < y < 4
 
     check = False
-  
 
     for rule in rules:
        check = (rule[0] <= cell.x <= rule[1] and rule[2] <= cell.y <= rule[3])
@@ -64,7 +63,7 @@ def getTargets(routerCell : cell.Cell, map : mapClass.Map) -> list[cell.Cell]:
             newCell = cell.Cell(j, i)
             if not checkOutsideWallArea(cell=newCell, rules=rules): # not n^3 as len(rules) is not that big
                 targets.append(newCell)
-                map.wired.add(newCell)
+                map.wired.add(newCell)            
 
   return targets
 

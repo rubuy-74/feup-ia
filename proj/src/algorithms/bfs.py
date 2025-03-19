@@ -13,7 +13,7 @@ def bfs(map: classMap.Map, start: cell.Cell, target: cell.Cell) -> list[cell.Cel
       return path
     
     for adj in current_cell.adjacents():
-      if 0 <= adj.x < map.rows and 0 <= adj.y < map.columns and adj not in visited:
+      if 0 <= adj.x < map.columns and 0 <= adj.y < map.rows and adj not in visited:
         visited.add(adj)
         queue.append((adj, path + [adj]))      
 

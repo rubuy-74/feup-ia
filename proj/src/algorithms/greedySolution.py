@@ -1,57 +1,64 @@
+from time import process_time
 import models.map as mapClass
 import models.router as router
 import models.solution as solution
 import models.cell as cell
-import algorithms.bfs as bfs
 import utils as utils
-
+import models.cell as cell
 import collections
 
-def checkValidRouter(map: mapClass.Map, cell:cell.Cell) -> bool:
-  return map.isTarget(cell=cell)
-
-def getPath(map: mapClass.Map, r: router.Router) -> list[cell.Cell]:
-  result = bfs.bfs(map=map,start=map.backbone.cell,target=r.cell)
-  return result[1:-1]
-
-def findRouterCell(map: mapClass.Map, routers: list[router.Router]) -> cell.Cell:
-  queue = collections.deque([map.backbone.cell])
+def findRouterCell(map: mapClass.Map, routers: set[cell.Cell], start_cell: cell.Cell) -> tuple:
+  queue = collections.deque([(start_cell, [])])
   visited = set()
   while queue:
-    possible_cell: cell.Cell = queue.popleft()
+    possible_cell, path  = queue.popleft()
 
-    if not map.isWall(possible_cell) and not map.isBackbone(possible_cell) and not map.isWired(possible_cell) and not map.isVoid(possible_cell) and router.Router(possible_cell, 0, 0, map) not in routers:
-      return possible_cell
-    
+    if not map.isWall(possible_cell) and not map.isBackbone(possible_cell) and not map.isWired(possible_cell) and not map.isVoid(possible_cell) and possible_cell not in routers:
+      return possible_cell, path
+  
+
     for adj in possible_cell.adjacents():
       if 0 <= adj.x < map.columns and 0 <= adj.y < map.rows and adj not in visited:
         visited.add(adj)
-        queue.append(adj)
+        queue.append((adj, path + [adj]))
 
-def greedySolution(map : mapClass.Map) -> solution.Solution:
+  return None, []
+
+def greedySolution(m : mapClass.Map) -> solution.Solution:
   value = 0
-  routers = []
+  routers = set()
   paths = dict()
 
-  while value < map.budget:
-    routerCell = findRouterCell(map=map,routers=routers)
+  start_cell = m.backbone.cell
+
+  time_start = process_time()
+
+  routers_cells = set()
+
+  while value < m.budget:
+    routerCell, path = findRouterCell(map=m,routers=routers_cells, start_cell=start_cell)
 
     if routerCell is None:
       break
 
-    r = router.Router(routerCell,map.rRange,map.rtPrice,map)
+    r = router.Router(routerCell,m.rRange,m.rtPrice,m)
     
-    tempPath = getPath(map=map,r=r)
-    
-    value += map.rtPrice + len(tempPath) * map.bbPrice
+    start_cell = r.cell
+
+    value += m.rtPrice + len(path) * m.bbPrice
 
     print("Value is: " + str(value))
 
-    if value > map.budget:
+    if value > m.budget:
       break
     
-    routers.append(r)
-    paths[r.cell] = tempPath
+    routers.add(r)
+    routers_cells.add(r.cell)
     
+    paths[r.cell] = path    
+    
+  time_end = process_time()
+
+  print("TIME: " + str(time_end - time_start))
 
   return solution.Solution(paths=paths,routers=routers)

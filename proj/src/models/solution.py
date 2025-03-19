@@ -2,7 +2,7 @@ import utils as utils
 import models.router as router
 
 class Solution:
-  def __init__(self,paths : dict, routers :list):
+  def __init__(self,paths : dict, routers : set):
     self.routers = routers
     self.paths = paths
     self.n = len(routers)
