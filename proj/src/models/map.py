@@ -7,9 +7,9 @@ class Map:
   def __init__(self, 
               rows : int, 
               columns : int, 
-              walls : list[cell.Cell], 
-              voids : list[cell.Cell], 
-              targets: list[cell.Cell], 
+              walls : set[cell.Cell], 
+              voids : set[cell.Cell], 
+              targets: set[cell.Cell], 
               backbone: backbone.Backbone, 
               budget: int, 
               rtPrice: int, 
@@ -46,8 +46,10 @@ class Map:
     return cell == self.backbone.cell
 
   def evaluate(self,solution: solution.Solution) -> int:
-    print("Targeted cells: " + str(solution.t))
-    print("BB cells: " + str(solution.m))
-    print("Cost: " + str(solution.m * self.bbPrice + solution.n * self.rtPrice))
-    print("Router cells: " + str(solution.n))
-    return 1000 * solution.t + ( self.budget - ( solution.m * self.bbPrice + solution.n * self.rtPrice ) )
+    print("Routers:", solution.routers)
+    print("BB cells:", solution.backbone_cells)
+
+    cost = len(solution.backbone_cells) * self.bbPrice + len(solution.routers) * self.rtPrice
+
+    print("Cost:", cost)
+    return 1000 * len(solution.getTargets()) + ( self.budget - cost )

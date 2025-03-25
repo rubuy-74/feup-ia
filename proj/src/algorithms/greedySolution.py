@@ -27,13 +27,12 @@ def findRouterCell(map: mapClass.Map, routers: set[cell.Cell], start_cell: cell.
 def greedySolution(m : mapClass.Map) -> solution.Solution:
   value = 0
   routers = set()
-  paths = dict()
+  backbone_cells = set()
+  routers_cells = set()
 
   start_cell = m.backbone.cell
 
   time_start = process_time()
-
-  routers_cells = set()
 
   while value < m.budget:
     routerCell, path = findRouterCell(map=m,routers=routers_cells, start_cell=start_cell)
@@ -55,10 +54,10 @@ def greedySolution(m : mapClass.Map) -> solution.Solution:
     routers.add(r)
     routers_cells.add(r.cell)
     
-    paths[r.cell] = path    
+    backbone_cells.update(path)   
     
   time_end = process_time()
 
   print("TIME: " + str(time_end - time_start))
 
-  return solution.Solution(paths=paths,routers=routers)
+  return solution.Solution(backbone_cells=backbone_cells,routers=routers)

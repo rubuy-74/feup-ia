@@ -6,7 +6,7 @@ class Router:
     self.cell = cell
     self.range_ = range_
     self.cost = cost
-    self.targets = utils.getTargets(cell,map) 
+    self.targets = utils.getTargets(cell, map) 
 
   def __str__(self):
     return "[" + str(self.cell) + ", " + str(self.cost) + ", " + str(self.range_) + "]"

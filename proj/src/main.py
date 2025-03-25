@@ -42,9 +42,6 @@ def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
   screen.fill((0, 0, 0))
   print("Drawing")
 
-  
-  bb_cells = set(path for paths in sol.paths.values() for path in paths)
-
   for t in m.targets:
     draw_pixel(screen, t.x, t.y, target, size)
   for n in targets:
@@ -53,7 +50,7 @@ def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
     draw_pixel(screen, w.x, w.y, wall, size)
   for v in m.voids:
     draw_pixel(screen, v.x, v.y, void, size)
-  for w in bb_cells:
+  for w in sol.backbone_cells:
     draw_pixel(screen, w.x, w.y, (157, 0, 255), size)
   for r in routerCells:
     draw_pixel(screen, r.x, r.y, router, size)
@@ -234,10 +231,6 @@ def main():
     elif state == 'FROZEN':
       pygame.display.flip()
           
-        
-
-
-  
 
 if __name__ == "__main__":
   main()
