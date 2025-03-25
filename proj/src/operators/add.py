@@ -11,12 +11,12 @@ def add_router(s: Solution, m: Map) -> Solution:
   router_cells = [router.cell for router in m.routers]
 
   while True:
-    x = random.randint(0, m.columns)
-    y = random.randint(0, m.rows)
+    x = random.randint(0, m.columns - 1)
+    y = random.randint(0, m.rows - 1)
 
     possible_cell = Cell(x, y)
 
-    if possible_cell not in (m.wired and m.walls and m.voids and router_cells) and not m.isBackbone(possible_cell):
+    if possible_cell not in m.wired and possible_cell not in m.walls and possible_cell not in m.voids and possible_cell not in router_cells and not m.isBackbone(possible_cell):
       next_router_cell = possible_cell
       break
 
