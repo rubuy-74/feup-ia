@@ -10,5 +10,5 @@ class Solution:
     return f"[{str(self.routers)},{str(self.backbone_cells)}]"
 
   def getTargets(self):
-    targets = map(lambda router: router.targets, self.routers)
+    targets = map(lambda router: router.coverage, self.routers)
     return {x for xs in targets for x in xs}

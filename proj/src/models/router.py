@@ -1,12 +1,14 @@
-import models.cell as cell
 import utils as utils
 
 class Router:
-  def __init__(self, cell, range_, cost, map):
+  def __init__(self, cell, range_, cost, coverage):
+    
+    from models.map import Map # lazy import to avoid circular dependency
+    
     self.cell = cell
     self.range_ = range_
     self.cost = cost
-    self.targets = utils.getTargets(cell, map) 
+    self.coverage = coverage
 
   def __str__(self):
     return "[" + str(self.cell) + ", " + str(self.cost) + ", " + str(self.range_) + "]"

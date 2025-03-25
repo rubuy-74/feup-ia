@@ -40,7 +40,7 @@ def greedySolution(m : mapClass.Map) -> solution.Solution:
     if routerCell is None:
       break
 
-    r = router.Router(routerCell,m.rRange,m.rtPrice,m)
+    r = router.Router(routerCell,m.rRange,m.rtPrice, m.computeRouterTargets(routerCell))
     
     start_cell = r.cell
 
