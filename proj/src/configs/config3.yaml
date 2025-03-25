@@ -1,6 +1,6 @@
 algorithm: greedy
-map: example.in
-size: 30
+map: opera.in
+size: 1
 seed: 0
 probabilities:
   Change: 0.5

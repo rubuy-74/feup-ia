@@ -23,7 +23,8 @@ def getPath(map: mapClass.Map, router : router.Router) -> list[cell.Cell]:
   result = bfs.bfs(map=map,start=map.backbone.cell,target=router.cell)
   return result[1:-1]
 
-def randomSolution(map : mapClass.Map) -> solution.Solution:
+def randomSolution(map : mapClass.Map, seed) -> solution.Solution:
+  random.seed(seed)
   value = 0
   routers = []
   paths = dict()

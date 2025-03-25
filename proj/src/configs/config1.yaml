@@ -1,6 +1,6 @@
 algorithm: greedy
-map: example.in
-size: 30
+map: charleston_road.in
+size: 3
 seed: 0
 probabilities:
   Change: 0.5

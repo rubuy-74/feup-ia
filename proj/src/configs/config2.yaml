@@ -1,6 +1,6 @@
 algorithm: greedy
-map: example.in
-size: 30
+map: lets_go_higher.in
+size: 1
 seed: 0
 probabilities:
   Change: 0.5

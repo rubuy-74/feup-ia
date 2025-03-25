@@ -10,6 +10,7 @@ import models.map as mapClass
 import models.router as router
 import math
 import yaml
+import time
 
 
 
@@ -66,49 +67,56 @@ def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
   pygame.display.flip()
 
 
-def load_config(config):
-  print("Loading config")
+def load_config(config_file):
+  with open(config_file) as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
+  
   print(config)
+  return config
+  
 
 def main():
   pygame.init()
 
-  with open('configs/default.yaml') as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
-    load_config(config)
-  size = 1
-
   m : mapClass.Map
+
+  # Define the states and texts of the game
   state = 'MENU'
-  title_text = 'Hello, choose the file!'
+  title_text = 'Hello, choose the config!'
   texts = ['Simple Example', 'Charleston Road', 'Lets Go Higher', 'Opera', 'Rue De Londres']
   file_options = ['example.in', 'charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
   algorithms = ['Random', 'Greedy', 'Hill Climbing', 'Simulated Annealing', 'Tabu Search', 'Genetic Algorithm']
+  algorithms_config = ['random', 'greedy', 'hill_climbing', 'simulated_annealing', 'tabu_search', 'genetic_algorithm']
+
+  # Loads the default config with the seed set to the current time in nanoseconds
+  config = load_config('configs/default.yaml')
+  config['seed'] = int(time.time()*1e9)
 
 
 
 
-
-
+  # Initialize the choice variables
+  choice_config = 0
   choice_map = 0
-
   choice_alg = 0
 
-  font = pygame.font.SysFont(None, 55)
+  # Load the config file if it is passed as an argument
+  if len(sys.argv) > 1:
+        config = load_config("configs/" +sys.argv[1])
+        state = 'ALGORITHM'
 
+
+  # Define the options for the game screen
+  font = pygame.font.SysFont(None, 55)
   screen = pygame.display.set_mode((1000, 900))
   pygame.display.set_caption('Router Placement')
-
   hwnd = pygame.display.get_wm_info()['window']
 
-  # Move the window to the top-left corner
-  # ctypes.windll.user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0)
 
-
+  # Create the title
   title = font.render(title_text, True, (255, 255, 255))
 
-  
-
+  # Run the program loop
   running = True
   while running:
     for event in pygame.event.get():
@@ -125,13 +133,12 @@ def main():
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map])
             if(choice_map == 0):
-              size = 30
+              config['size'] = 30
             elif choice_map == 1:
-             size = 2
+             config['size'] = 2
             else:
-              size = 1
-            path = "../maps/"+file_options[choice_map]
-            m = utils.parse(path)
+              config['size'] = 1
+            config['map'] = "../maps/" + file_options[choice_map]
             state = 'ALGCHOICE'
       elif state == 'ALGCHOICE':
         if event.type == pygame.QUIT:
@@ -145,35 +152,46 @@ def main():
             choice_alg = (choice_alg - 1) % len(algorithms)
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map] + ' - ' +algorithms[choice_alg])
+            config['algorithm'] = algorithms_config[choice_alg]
             screen.fill((0, 0, 0))
             pygame.display.flip()
             state = 'ALGORITHM'
       elif state == 'ALGORITHM':
-        if(choice_alg == 0):
-          draw_map(screen, m, size)
-          sol = randomSolution.randomSolution(m)
+        m = utils.parse("../maps/"+config['map'])
+        screen.fill((0, 0, 0))
+
+        if(config['algorithm'] == 'random'):
+          print("Random")
+          draw_map(screen, m, config['size'])
+          sol = randomSolution.randomSolution(m, config['seed'])
           print(sol)
           print(m.evaluate(sol))
-          
-          draw_solution(screen, m, sol, size)
+          screen.fill((0, 0, 0))
+
+          draw_solution(screen, m, sol, config['size'])
 
           state = 'FROZEN'
           print("Done")
-
-        elif(choice_alg == 1):
-          draw_map(screen, m, size)
+        elif(config['algorithm'] == 'greedy'):
+          print("Greedy")
+          draw_map(screen, m, config['size'])
           sol = greedySolution.greedySolution(m)
           print(sol)
           print(m.evaluate(sol))
+          screen.fill((0, 0, 0))
 
-          draw_solution(screen, m, sol, size)
-          
+          draw_solution(screen, m, sol, config['size'])
+
           state = 'FROZEN'
           print("Done")
-
-
         else:
           state = 'NOT_IMPLEMENTED'
+        for event in pygame.event.get():
+          if event.type == pygame.QUIT:
+            running = False
+          elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+              running = False
         for event in pygame.event.get():
           if event.type == pygame.QUIT:
             running = False
@@ -193,8 +211,6 @@ def main():
           if event.key == pygame.K_ESCAPE:
             running = False
 
-    
-    # print(solGreedy)
     if state == 'MENU':
         # Fill the screen with black
         screen.fill((0, 0, 0))
@@ -211,7 +227,6 @@ def main():
             y += 60  # Adjust the y position for the next text
 
         # Update the display
-        pygame.display.flip()
 
     elif state == 'ALGCHOICE':
         # Fill the screen with black
@@ -229,18 +244,31 @@ def main():
             y += 60  # Adjust the y position for the next text
 
         # Update the display
-        pygame.display.flip()
     
     elif state == 'NOT_IMPLEMENTED':
       screen.fill((0, 0, 0))
       text = font.render('Not implemented yet', True, (255, 0, 0))
       screen.blit(text, (10, 50))
-      pygame.display.flip()
+
 
 
     elif state == 'FROZEN':
-      pygame.display.flip()
-          
+      continue
+
+    elif state == 'LOADCONFIG':
+      print("Loading config")
+      filename = 'configs/'
+      if choice_config == 0:
+        filename += 'default.yaml'
+      elif choice_config == 1:
+        filename += 'custom.yaml'
+      else:
+        filename += 'config'+str(choice_config-1)+'.yaml'
+      config = load_config(filename)
+      state = 'ALGORITHM'
+    
+    pygame.display.flip()
+
         
 
 
