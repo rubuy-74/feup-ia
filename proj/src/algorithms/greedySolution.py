@@ -26,8 +26,6 @@ def findRouterCell(map: mapClass.Map, routers: set[cell.Cell], start_cell: cell.
 
 def greedySolution(m : mapClass.Map) -> solution.Solution:
   value = 0
-  routers = set()
-  backbone_cells = set()
   routers_cells = set()
 
   start_cell = m.backbone.cell
@@ -40,24 +38,22 @@ def greedySolution(m : mapClass.Map) -> solution.Solution:
     if routerCell is None:
       break
 
-    r = router.Router(routerCell,m.rRange,m.rtPrice, m.computeRouterTargets(routerCell))
-    
-    start_cell = r.cell
-
     value += m.rtPrice + len(path) * m.bbPrice
-
-    print("Value is: " + str(value))
 
     if value > m.budget:
       break
+
+    r = router.Router(routerCell,m.rRange,m.rtPrice, m.computeRouterTargets(routerCell))
     
-    routers.add(r)
+    start_cell = r.cell
+    
+    m.routers.add(r)
     routers_cells.add(r.cell)
     
-    backbone_cells.update(path)   
+    m.backbone.connected_to.update(path)   
     
   time_end = process_time()
 
   print("TIME: " + str(time_end - time_start))
 
-  return solution.Solution(backbone_cells=backbone_cells,routers=routers)
+  return solution.Solution(backbone_cells=m.backbone.connected_to, routers=m.routers)

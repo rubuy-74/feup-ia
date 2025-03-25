@@ -25,14 +25,12 @@ def getPath(m: mapClass.Map, router : router.Router) -> list[cell.Cell]:
 
 def randomSolution(m: mapClass.Map) -> solution.Solution:
   value = 0
-  routers = []
-  backbone_cells = set()
 
   # Budget must be less than price of a new router
   while (value + m.rtPrice) < m.budget:
     router = placeRouter(m)
-    if router not in routers:
-      backbone_cells.update(getPath(m=m,router=router))
-      routers.append(router)
+    if router not in m.routers:
+      m.backbone.connected_to.update(getPath(m=m,router=router))
+      m.routers.add(router)
       value += m.rtPrice
-  return solution.Solution(routers=routers,backbone_cells=backbone_cells)
+  return solution.Solution(routers=m.routers,backbone_cells=m.backbone.connected_to)

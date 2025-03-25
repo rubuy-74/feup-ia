@@ -20,6 +20,7 @@ class Map:
       self.walls = walls
       self.voids = voids
       self.targets = targets
+      self.routers = set()
       self.wired = set()
       self.backbone = backbone
       self.budget = budget

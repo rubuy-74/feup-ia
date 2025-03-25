@@ -13,7 +13,7 @@ def parse(file):
     t = set() # testing with sets for O(1)
     v = set()
     w = set()
-    b = backbone.Backbone(cell.Cell(int(bx), int(by)), int(bb_cost), set())
+    b = backbone.Backbone(cell.Cell(int(bx), int(by)), int(bb_cost))
     
     for i, line in enumerate(lines[3:]):
       for j, c in enumerate(line):
