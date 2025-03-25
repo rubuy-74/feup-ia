@@ -17,10 +17,10 @@ def placeRouter(m: mapClass.Map ) -> router.Router:
       return router.Router(routerCell,m.rRange,m.rtPrice, m.computeRouterTargets(routerCell))
 
 def checkValidRouter(m: mapClass.Map, cell:cell.Cell) -> bool:
-  return m.isTarget(cell=cell)
+  return m.isTarget(cell=cell) and cell not in m.wired
 
 def getPath(m: mapClass.Map, router : router.Router) -> list[cell.Cell]:
-  result = bfs.bfs(map=m,start=m.backbone.cell,target=router.cell)
+  result = bfs.bfs(m=m,start=m.backbone.cell,target=router.cell)
   return result[1:-1]
 
 def randomSolution(m: mapClass.Map) -> solution.Solution:
