@@ -8,6 +8,9 @@ import models.solution as solution
 import models.cell as cell
 import models.map as mapClass
 import models.router as router
+import math
+import yaml
+
 
 
 def draw_pixel(screen, x, y, color, size):
@@ -15,7 +18,7 @@ def draw_pixel(screen, x, y, color, size):
 
 
 def draw_map(screen, m: mapClass.Map, size):
-  void = (0, 0, 0)
+  void = (255, 255, 255)
   wall = (128, 128, 128)
   target = (255, 255, 0)
 
@@ -63,11 +66,16 @@ def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
   pygame.display.flip()
 
 
+def load_config(config):
+  print("Loading config")
+  print(config)
+
 def main():
   pygame.init()
 
-  out = open("output.txt", "w")
-
+  with open('configs/default.yaml') as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
+    load_config(config)
   size = 1
 
   m : mapClass.Map
@@ -138,11 +146,11 @@ def main():
           elif event.key == pygame.K_RETURN:
             pygame.display.set_caption('Router Placement - ' + texts[choice_map] + ' - ' +algorithms[choice_alg])
             screen.fill((0, 0, 0))
-            draw_map(screen, m, size)
             pygame.display.flip()
             state = 'ALGORITHM'
       elif state == 'ALGORITHM':
         if(choice_alg == 0):
+          draw_map(screen, m, size)
           sol = randomSolution.randomSolution(m)
           print(sol)
           print(m.evaluate(sol))
@@ -150,7 +158,7 @@ def main():
           draw_solution(screen, m, sol, size)
 
           state = 'FROZEN'
-          out.close()
+          print("Done")
 
         elif(choice_alg == 1):
           draw_map(screen, m, size)
@@ -162,7 +170,6 @@ def main():
           
           state = 'FROZEN'
           print("Done")
-          out.close()
 
 
         else:
