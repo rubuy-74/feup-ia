@@ -56,8 +56,7 @@ class Map:
 
     cost = self.get_cost(solution)
 
-    
-    return 1000 * len(solution.getTargets()) + ( self.budget - cost )
+    return 1000 * len(solution.computeCoverage()) + ( self.budget - cost )
 
   def computeRouterTargets(self, routerCell:cell.Cell) -> list[cell.Cell]:
     targets = []

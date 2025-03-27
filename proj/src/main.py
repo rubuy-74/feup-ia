@@ -38,7 +38,7 @@ def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
   target_router = (0, 255, 0)
   backbone = (255, 0, 0)
   router = (0, 0, 255)
-  targets = sol.getTargets()
+  targets = sol.computeCoverage()
   routerCells = list(map(lambda router: router.cell, sol.routers))
   print("Screen Blackout")
   screen.fill((0, 0, 0))
