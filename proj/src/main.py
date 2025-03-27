@@ -9,6 +9,7 @@ import models.solution as solution
 import models.cell as cell
 import models.map as mapClass
 import models.router as router
+import operators.remove as remove
 import time
 
 def draw_pixel(screen, x, y, color, size):
@@ -145,13 +146,13 @@ def main():
           
           print(sol)
           print(m.evaluate(sol))
+          draw_solution(screen, m, sol, size)
+
+          sol = remove.remove(sol, m)
+
+          time.sleep(1)
 
           draw_solution(screen, m, sol, size)
-          
-          for i in range(500):
-            sol = hillClimb.hillclimb(sol, m, 1)
-            time.sleep(1)      
-            draw_solution(screen, m, sol, size)
 
           state = 'FROZEN'
           out.close()
@@ -164,10 +165,11 @@ def main():
 
           draw_solution(screen, m, sol, size)
 
-          for i in range(500):
-            sol = hillClimb.hillclimb(sol, m, 1)
-                  
-            draw_solution(screen, m, sol, size)
+          sol = remove.remove(sol, m)
+
+          time.sleep(1)
+
+          draw_solution(screen, m, sol, size)
           
           
           state = 'FROZEN'

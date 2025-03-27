@@ -29,9 +29,6 @@ def parse(file):
             w.add(pos)
           case "r":
             r.add(Router(pos, range_, rt_cost, []))
-          case "u":
-            b.connected_to.add(pos)
-
 
     return mapClass.Map(
       rows=int(rows),

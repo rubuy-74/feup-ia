@@ -29,10 +29,10 @@ def bfs_to_backbone_cell(m: classMap.Map, start: cell.Cell) -> list[cell.Cell]:
   while queue:
     current_cell, path = queue.popleft()
     
-    if (start in router_cells) and (current_cell in m.backbone.connected_to or current_cell == m.backbone.cell):
+    if (start in router_cells) and (current_cell in m.backbone.connections.values() or current_cell == m.backbone.cell):
         return path
     
-    if not (start in router_cells) and (current_cell in m.backbone.connected_to or current_cell in router_cells):
+    if not (start in router_cells) and (current_cell in m.backbone.connections.values() or current_cell in router_cells):
         return path
     
     for adj in current_cell.adjacents():

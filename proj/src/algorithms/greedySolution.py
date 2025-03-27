@@ -51,10 +51,10 @@ def greedySolution(m : mapClass.Map) -> solution.Solution:
     m.routers.add(r)
     routers_cells.add(r.cell)
     
-    m.backbone.connected_to.update(path)   
+    m.backbone.connections[r.cell] = path
     
   time_end = process_time()
 
   print("TIME: " + str(time_end - time_start))
 
-  return solution.Solution(backbone_cells=m.backbone.connected_to, routers=m.routers)
+  return solution.Solution(backbone_cells=m.backbone.connections, routers=m.routers)

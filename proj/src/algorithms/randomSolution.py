@@ -30,7 +30,8 @@ def randomSolution(m: mapClass.Map) -> solution.Solution:
   while (value + m.rtPrice) < m.budget:
     router = placeRouter(m)
     if router not in m.routers:
-      m.backbone.connected_to.update(getPath(m=m,router=router))
+      m.backbone.connections[router.cell] = getPath(m=m,router=router)
       m.routers.add(router)
       value += m.rtPrice
-  return solution.Solution(routers=m.routers,backbone_cells=m.backbone.connected_to)
+
+  return solution.Solution(routers=m.routers, backbone_cells=m.backbone.connections)
