@@ -47,7 +47,7 @@ class Map:
   def isBackbone(self,cell: cell.Cell):
     return cell == self.backbone.cell
 
-  def get_cost(self,solution: solution.Solution) -> int:
+  def get_cost(self, solution: solution.Solution) -> int:
     return len(solution.backbone_cells) * self.bbPrice + len(solution.routers) * self.rtPrice
 
   def evaluate(self,solution: solution.Solution) -> int:

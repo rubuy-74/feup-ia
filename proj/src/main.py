@@ -10,6 +10,7 @@ import models.cell as cell
 import models.map as mapClass
 import models.router as router
 import operators.remove as remove
+import operators.add as add
 import time
 
 def draw_pixel(screen, x, y, color, size):
@@ -52,7 +53,7 @@ def draw_solution(screen, m: mapClass.Map, sol: solution.Solution, size):
     draw_pixel(screen, w.x, w.y, wall, size)
   for v in m.voids:
     draw_pixel(screen, v.x, v.y, void, size)
-  for w in sol.backbone_cells:
+  for w in sol.getBackboneCellsInSet():
     draw_pixel(screen, w.x, w.y, (157, 0, 255), size)
   for r in routerCells:
     draw_pixel(screen, r.x, r.y, router, size)
@@ -148,13 +149,13 @@ def main():
           print(m.evaluate(sol))
           draw_solution(screen, m, sol, size)
 
-          sol = remove.remove(sol, m)
-
-          time.sleep(1)
-
-          draw_solution(screen, m, sol, size)
+          for i in range(500):
+            sol = hillClimb.hillclimb(sol, m, 1)
+            time.sleep(0.1)
+            draw_solution(screen, m, sol, size)
 
           state = 'FROZEN'
+          print("Done")
           out.close()
 
         elif(choice_alg == 1):
@@ -165,11 +166,10 @@ def main():
 
           draw_solution(screen, m, sol, size)
 
-          sol = remove.remove(sol, m)
-
-          time.sleep(1)
-
-          draw_solution(screen, m, sol, size)
+          for i in range(500):
+            sol = hillClimb.hillclimb(sol, m, 1)
+            time.sleep(0.1)
+            draw_solution(screen, m, sol, size)
           
           
           state = 'FROZEN'

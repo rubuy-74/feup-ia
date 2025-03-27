@@ -4,13 +4,16 @@ from algorithms.functions import mutation_func
 
 #TODO: Change number of iterations to time
 def hillclimb(solution: Solution, m: Map, it: int):
-  while True:
+  for _ in range(it):
     new_solution = mutation_func(m,solution)
     new_solution_value = m.evaluate(new_solution)
     solution_value = m.evaluate(solution)
 
-    if(new_solution_value >= solution_value):
-      print("New cost:", new_solution_value)
-      solution = new_solution
-      break
+    print(solution_value, new_solution_value)
+
+    # if(new_solution_value >= solution_value):
+    solution = new_solution
+    m.backbone.connections = solution.backbone_cells
+    m.routers = solution.routers
+
   return solution

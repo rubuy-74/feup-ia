@@ -43,3 +43,11 @@ def parse(file):
       rRange=int(range_),
       routers=r
     )
+  
+def convertDictToSet(d):
+  result = set()
+  
+  for item in d.values():
+    result.update(item)
+
+  return result
