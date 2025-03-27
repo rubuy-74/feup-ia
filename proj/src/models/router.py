@@ -1,7 +1,8 @@
 import utils as utils
+from models.cell import Cell
 
 class Router:
-  def __init__(self, cell, range_, cost, coverage):
+  def __init__(self, cell : Cell, range_, cost, coverage):
     
     from models.map import Map # lazy import to avoid circular dependency
     

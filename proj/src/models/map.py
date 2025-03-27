@@ -46,11 +46,14 @@ class Map:
   def isBackbone(self,cell: cell.Cell):
     return cell == self.backbone.cell
 
+  def get_cost(self,solution: solution.Solution) -> int:
+    return len(solution.backbone_cells) * self.bbPrice + len(solution.routers) * self.rtPrice
+
   def evaluate(self,solution: solution.Solution) -> int:
     print("Routers:", solution.routers)
     print("BB cells:", solution.backbone_cells)
 
-    cost = len(solution.backbone_cells) * self.bbPrice + len(solution.routers) * self.rtPrice
+    cost = self.get_cost(solution)
 
     print("Cost:", cost)
     return 1000 * len(solution.getTargets()) + ( self.budget - cost )
