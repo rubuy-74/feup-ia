@@ -6,38 +6,34 @@ import random
 
 from models.cell import Cell
 
-def add_router(s: Solution, m: Map) -> Solution:
+def add(s: Solution, m: Map) -> Solution:
   next_router_cell = None
   router_cells = [router.cell for router in m.routers]
 
-  while True:
-    x = random.randint(0, m.columns - 1)
-    y = random.randint(0, m.rows - 1)
+  remaining_target_cells = list(m.wired.difference(m.targets))
 
-    possible_cell = Cell(x, y)
-
-    if possible_cell not in m.wired and possible_cell not in m.walls and possible_cell not in m.voids and possible_cell not in router_cells and not m.isBackbone(possible_cell):
-      next_router_cell = possible_cell
-      break
-
-  if next_router_cell == None:
+  if len(remaining_target_cells) == 0:
     while True:
-      x = random.randint(0, m.columns)
-      y = random.randint(0, m.rows)
+      possible_cell = random.choice(list(m.targets))
 
-      possible_cell = Cell(x, y)
-
-      if possible_cell not in (m.walls and m.voids and router_cells) and not m.isBackbone(possible_cell):
+      if possible_cell not in (m.walls and m.voids and router_cells) and not m.isBackbone(possible_cell) and possible_cell not in router_cells:
         next_router_cell = possible_cell
         break
+  else:
+    possible_cell = random.choice(remaining_target_cells)
+    
+    if possible_cell not in router_cells and not m.isBackbone(possible_cell):
+      next_router_cell = possible_cell
 
-  s.routers.add(Router(possible_cell, m.rRange, m.rtPrice, m.computeRouterTargets(possible_cell)))
+  new_router = Router(next_router_cell, m.rRange, m.rtPrice, m.computeRouterTargets(next_router_cell))
   
-  s.backbone_cells.update(bfs_to_backbone_cell(m, possible_cell))
+  # change map routers and create new list for further solution
+  m.routers.add(new_router)
+  new_routers = s.routers.union({new_router})
 
-  return s
-  
+  # change map backbone cells and create new list for further solution
+  new_backbone_cells = s.backbone_cells.union(bfs_to_backbone_cell(m, next_router_cell))
+  m.backbone.connected_to.update(bfs_to_backbone_cell(m, next_router_cell))
 
 
-def remove_router(s: Solution, m: Map):
-  print("to implement")
+  return Solution(new_backbone_cells, new_routers)

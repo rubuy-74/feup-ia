@@ -4,11 +4,12 @@ import ctypes
 import utils as utils
 import algorithms.randomSolution as randomSolution
 import algorithms.greedySolution as greedySolution
+import algorithms.hillclimb as hillClimb
 import models.solution as solution
 import models.cell as cell
 import models.map as mapClass
 import models.router as router
-
+import time
 
 def draw_pixel(screen, x, y, color, size):
     pygame.draw.rect(screen, color, (x*size, y*size, size, size))
@@ -141,10 +142,16 @@ def main():
       elif state == 'ALGORITHM':
         if(choice_alg == 0):
           sol = randomSolution.randomSolution(m)
+          
           print(sol)
           print(m.evaluate(sol))
-          
+
           draw_solution(screen, m, sol, size)
+          
+          for i in range(500):
+            sol = hillClimb.hillclimb(sol, m, 1)
+            time.sleep(1)      
+            draw_solution(screen, m, sol, size)
 
           state = 'FROZEN'
           out.close()
@@ -156,6 +163,12 @@ def main():
           print(m.evaluate(sol))
 
           draw_solution(screen, m, sol, size)
+
+          for i in range(500):
+            sol = hillClimb.hillclimb(sol, m, 1)
+                  
+            draw_solution(screen, m, sol, size)
+          
           
           state = 'FROZEN'
           print("Done")

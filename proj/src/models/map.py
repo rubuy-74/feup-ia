@@ -14,13 +14,14 @@ class Map:
               budget: int, 
               rtPrice: int, 
               bbPrice: int,
-              rRange: int):
+              rRange: int,
+              routers: set[cell.Cell]):
       self.rows = rows
       self.columns = columns
       self.walls = walls
       self.voids = voids
       self.targets = targets
-      self.routers = set()
+      self.routers = routers
       self.wired = set()
       self.backbone = backbone
       self.budget = budget
@@ -50,12 +51,12 @@ class Map:
     return len(solution.backbone_cells) * self.bbPrice + len(solution.routers) * self.rtPrice
 
   def evaluate(self,solution: solution.Solution) -> int:
-    print("Routers:", solution.routers)
-    print("BB cells:", solution.backbone_cells)
+    #print("Routers:", solution.routers)
+    #print("BB cells:", solution.backbone_cells)
 
     cost = self.get_cost(solution)
 
-    print("Cost:", cost)
+    
     return 1000 * len(solution.getTargets()) + ( self.budget - cost )
 
   def computeRouterTargets(self, routerCell:cell.Cell) -> list[cell.Cell]:

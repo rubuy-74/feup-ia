@@ -14,6 +14,7 @@ def findRouterCell(map: mapClass.Map, routers: set[cell.Cell], start_cell: cell.
     possible_cell, path  = queue.popleft()
 
     if not map.isWall(possible_cell) and not map.isBackbone(possible_cell) and not map.isWired(possible_cell) and not map.isVoid(possible_cell) and possible_cell not in routers:
+      path.remove(possible_cell)
       return possible_cell, path
   
 
