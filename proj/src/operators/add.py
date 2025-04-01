@@ -33,11 +33,14 @@ def find_best_router_cell(s: Solution, m: Map):
     covered_cells = s.computeCoverage()
     non_covered_cells = m.targets.difference(covered_cells)
 
+    current_bb_cells = s.getBackboneCellsInSet();
+    current_bb_cells.add(m.backbone.cell)
+
     checked_cells = set()
     if non_covered_cells:
       c = random.choice(list(non_covered_cells - checked_cells))
       if router_is_valid(c, m, s):
-        path = bfs_to_backbone_cell(m, c)
+        path = bfs_to_backbone_cell(m, c, current_bb_cells)
         return c, path
       
       checked_cells.add(c)
@@ -56,6 +59,9 @@ def router_is_valid(c: Cell, m: Map, s: Solution):
 def maximizing_coverage(s: Solution, m: Map):
    best_pos, best_path, best_cov = None, [], 0
 
+   current_bb_cells = s.getBackboneCellsInSet();
+   current_bb_cells.add(m.backbone.cell)
+
    for _ in range(50):
     x = random.randint(0, m.columns - 1)
     y = random.randint(0, m.rows - 1)
@@ -63,18 +69,22 @@ def maximizing_coverage(s: Solution, m: Map):
     new_possible_cell = Cell(x, y)
 
     if router_is_valid(new_possible_cell, m, s):
-       path_to_bb = bfs_to_backbone_cell(m, new_possible_cell)
+       path_to_bb = bfs_to_backbone_cell(m, new_possible_cell, current_bb_cells)
 
        if path_to_bb:
           new_coverage = m.computeRouterTargets(new_possible_cell)
-          if new_coverage > best_cov:
-             best_cov = new_coverage
+          if len(new_coverage) > best_cov:
+             best_cov = len(new_coverage)
              best_path = path_to_bb
              best_pos = new_possible_cell
     
     return best_pos, best_path
 
 def totally_random(s: Solution, m: Map):
+
+   current_bb_cells = s.getBackboneCellsInSet();
+   current_bb_cells.add(m.backbone.cell)
+
    for _ in range(50):
     x = random.randint(0, m.columns - 1)
     y = random.randint(0, m.rows - 1)
@@ -82,7 +92,7 @@ def totally_random(s: Solution, m: Map):
     new_possible_cell = Cell(x, y)
 
     if router_is_valid(new_possible_cell, m, s):
-       path_to_bb = bfs_to_backbone_cell(m, new_possible_cell)
+       path_to_bb = bfs_to_backbone_cell(m, new_possible_cell, current_bb_cells)
 
        if path_to_bb:
           return new_possible_cell, path_to_bb
