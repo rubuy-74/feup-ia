@@ -25,12 +25,12 @@ class Cell:
 
     # adjacent cells in clockwise order starting from top-left corner
     return [
+        Cell(adjXneg, self.y),
+        Cell(adjXpos, self.y),
+        Cell(self.x, adjYneg), 
+        Cell(self.x, adjYpos),
         Cell(adjXneg, adjYneg),
-        Cell(self.x, adjYneg),
         Cell(adjXpos, adjYneg), 
-        Cell(adjXpos, self.y), 
         Cell(adjXpos, adjYpos), 
-        Cell(self.x, adjYpos), 
         Cell(adjXneg, adjYpos), 
-        Cell(adjXneg, self.y)
       ]

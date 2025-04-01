@@ -19,28 +19,21 @@ def bfs(m: classMap.Map, start: cell.Cell, target: cell.Cell) -> list[cell.Cell]
 
   return []
 
-def bfs_to_backbone_cell(m: classMap.Map, start: cell.Cell) -> list[cell.Cell]:
+def bfs_to_backbone_cell(m: classMap.Map, start: cell.Cell, targets: set[cell.Cell]) -> list[cell.Cell]:
+  print(targets)
+  
   queue = collections.deque([(start, [start])])
   visited = set()
   visited.add(start)
-
-  router_cells = [r.cell for r in m.routers]
   
   while queue:
     current_cell, path = queue.popleft()
-    
-    if (start in router_cells or not router_cells) and (current_cell in m.backbone.getConnectionsAsSet() or current_cell == m.backbone.cell):
-        return path + bfs(m, current_cell, m.backbone.cell)
-    
-    if not (start in router_cells) and (current_cell in m.backbone.getConnectionsAsSet() or current_cell in router_cells):
-        return path + bfs(m, current_cell, m.backbone.cell)
+    if current_cell in targets:
+      return path + bfs(m, current_cell, m.backbone.cell)
     
     for adj in current_cell.adjacents():
       if 0 <= adj.x < m.columns and 0 <= adj.y < m.rows and adj not in visited:
         visited.add(adj)
         queue.append((adj, path + [adj]))      
-
-        if adj in m.backbone.getConnectionsAsSet(): # no need to go to the queue
-          return path+[adj]+bfs(m, current_cell, m.backbone.cell)
-
+  
   return []
