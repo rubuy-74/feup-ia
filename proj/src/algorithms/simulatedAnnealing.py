@@ -1,4 +1,4 @@
-import algorithms.greedySolution as gS
+from algorithms.randomSolution import randomSolution
 from algorithms.functions import mutation_func
 from models.map import Map
 from models.solution import Solution
@@ -9,7 +9,7 @@ def simulated_annealing(m : Map,initial_temp=1000,cooling_rate=0.995,stopping_te
   solutions = []
 
   # Create initial solution
-  current_solution : Solution = gS.greedySolution(m)
+  current_solution : Solution = randomSolution(m)
   best_solution = current_solution
   best_solution_value = m.evaluate(current_solution)
 
