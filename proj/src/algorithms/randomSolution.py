@@ -8,7 +8,7 @@ import random
 
 import utils as utils
 
-def placeRouter(m: Map ) -> router.Router:
+def placeRouter(m: Map) -> router.Router:
   tries = 100
   while (tries): 
     x = random.randint(0,m.columns)
@@ -24,7 +24,9 @@ def placeRouter(m: Map ) -> router.Router:
 def checkValidRouter(m: Map, cell:cell.Cell) -> bool:
   return m.isTarget(cell=cell) and cell not in m.wired
 
-def randomSolution(m: Map) -> solution.Solution:
+def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
+  if(seed != -1):
+    random.seed(seed)
   value = 0
 
   # new_map : Map = Map(m.rows,m.columns,m.walls,m.voids,m.targets,m.backbone,m.budget,m.rtPrice,m.bbPrice,m.rRange,m.routers)
