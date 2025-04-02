@@ -77,11 +77,6 @@ def main():
   file_options = ['example.in', 'charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
   algorithms = ['Random', 'Greedy', 'Hill Climbing', 'Simulated Annealing', 'Tabu Search', 'Genetic Algorithm']
 
-
-
-
-
-
   choice_map = 0
 
   choice_alg = 0
@@ -151,7 +146,7 @@ def main():
 
           for i in range(500):
             sol = hillClimb.hillclimb(sol, m, 1)
-            time.sleep(0.1)
+            time.sleep(0.5)
             draw_solution(screen, m, sol, size)
 
           state = 'FROZEN'
@@ -168,7 +163,7 @@ def main():
 
           for i in range(500):
             sol = hillClimb.hillclimb(sol, m, 1)
-            time.sleep(0.1)
+            
             draw_solution(screen, m, sol, size)
           
           

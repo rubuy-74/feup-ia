@@ -15,4 +15,7 @@ class Solution:
     return coverage
   
   def getBackboneCellsInSet(self):
-    return utils.convertDictToSet(self.backbone_cells)
+    # return all backbone cells and also the routers, as they can serve as connections as well
+    result = utils.convertDictToSet(self.backbone_cells)
+    result.update({r.cell for r in self.routers})
+    return result 

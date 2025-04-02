@@ -12,8 +12,11 @@ def hillclimb(solution: Solution, m: Map, it: int):
     print(solution_value, new_solution_value)
 
     # if(new_solution_value >= solution_value):
+    
+    m.backbone.connections = new_solution.backbone_cells.copy()
+    for router in (new_solution.routers.difference(solution.routers)):
+      router.coverage = m.computeRouterTargets(router.cell)
+    m.routers = new_solution.routers
     solution = new_solution
-    m.backbone.connections = solution.backbone_cells
-    m.routers = solution.routers
 
   return solution
