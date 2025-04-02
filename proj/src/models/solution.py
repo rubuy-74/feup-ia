@@ -6,7 +6,7 @@ class Solution:
     self.backbone_cells = backbone_cells
 
   def __str__(self):
-    return f"[{str(self.routers)},{str(self.backbone_cells)}]"
+    return f"[{str(self.routers)},{str(self.getBackboneCellsInSet())}]"
 
   def computeCoverage(self):
     coverage = set()

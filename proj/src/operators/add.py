@@ -24,7 +24,7 @@ def add(s: Solution, m: Map):
     new_routers = s.routers.copy()
     new_routers.add(new_router)
 
-    new_bb_connections = m.backbone.connections
+    new_bb_connections = m.backbone.connections.copy()
     new_bb_connections[new_cell] = path
 
     return Solution(new_bb_connections, new_routers)
@@ -41,10 +41,10 @@ def find_best_router_cell(s: Solution, m: Map):
         return c, path
       
       checked_cells.add(c)
-        
-    c, path = maximizing_coverage(s, m)
-    if c:
-       return c, path
+         
+      c, path = maximizing_coverage(s, m)
+      if c:
+         return c, path
     
     return totally_random(s, m)
 
