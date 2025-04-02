@@ -1,27 +1,21 @@
 import utils as utils
-import models.router as router
 
 class Solution:
-  def __init__(self,paths : dict, routers : set):
+  def __init__(self, backbone_cells: dict, routers: set):
     self.routers = routers
-    self.paths = paths
-    self.n = len(routers)
-    self.m = getPathsLength(paths)
-    self.t = calculateTargets(routers) 
+    self.backbone_cells = backbone_cells
 
   def __str__(self):
-    return f"[{str(self.routers)},{str(self.paths)},{str(self.n)},{str(self.m)},{str(self.t)}]"
+    return f"[{str(self.routers)},{str(self.getBackboneCellsInSet())}]"
 
-  def getTargets(self):
-    targets = map(lambda router: router.targets,self.routers)
-    return [x for xs in targets for x in xs]
+  def computeCoverage(self):
+    coverage = set()
+    for r in self.routers:
+        coverage.update(r.coverage)
+    return coverage
   
-def calculateTargets(routers : list[router.Router]) -> int:
-  targetList : list[int] = list(map(lambda router: len(router.targets),routers))
-  return sum(targetList)
-
-def getPathsLength(paths : dict) -> int:
-  values = []
-  for _,v in paths.items():
-    values.append(len(v))
-  return sum(values)
+  def getBackboneCellsInSet(self):
+    # return all backbone cells and also the routers, as they can serve as connections as well
+    result = utils.convertDictToSet(self.backbone_cells)
+    result.update({r.cell for r in self.routers})
+    return result 

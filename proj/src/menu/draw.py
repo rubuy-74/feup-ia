@@ -27,16 +27,15 @@ def draw_solution(screen, m, sol, size):
         'path': (157, 0, 255),
     }
 
-
-    for cell in sol.getTargets():
+    for cell in m.wired:
         draw_pixel(screen, cell.x, cell.y, colors['target_router'], size)
     for cell in m.walls:
         draw_pixel(screen, cell.x, cell.y, (128, 128, 128), size)
-    for cell in sol.routers:
-        draw_pixel(screen, cell.cell.x, cell.cell.y, colors['router'], size)
-    for path in sol.paths.values():
+    for path in sol.backbone_cells.values():
         for cell in path:
             draw_pixel(screen, cell.x, cell.y, colors['path'], size)
+    for cell in sol.routers:
+        draw_pixel(screen, cell.cell.x, cell.cell.y, colors['router'], size)
     
     draw_pixel(screen, m.backbone.cell.x, m.backbone.cell.y, colors['backbone'], size)
     pygame.display.flip()

@@ -22,15 +22,21 @@ class Cell:
     adjXneg = self.x - 1
     adjYpos = self.y + 1
     adjYneg = self.y - 1
-
+    
     # adjacent cells in clockwise order starting from top-left corner
     return [
+        Cell(adjXneg, self.y),
+        Cell(adjXpos, self.y),
+        Cell(self.x, adjYneg), 
+        Cell(self.x, adjYpos),
         Cell(adjXneg, adjYneg),
-        Cell(self.x, adjYneg),
         Cell(adjXpos, adjYneg), 
-        Cell(adjXpos, self.y), 
         Cell(adjXpos, adjYpos), 
-        Cell(self.x, adjYpos), 
         Cell(adjXneg, adjYpos), 
-        Cell(adjXneg, self.y)
       ]
+  
+  def __lt__(self, other):
+    if self.x != other.x:
+        return self.x < other.x
+    else:
+        return self.y < other.y

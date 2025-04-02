@@ -1,39 +1,51 @@
-import models.map as mapClass
 import models.solution as solution
 import models.router as router
 import models.cell as cell
-import algorithms.bfs as bfs
+from algorithms.bfs import bfs_to_backbone_cell
+from models.map import Map
+from models.cell import Cell
 import random
 
 import utils as utils
 
-def placeRouter(map : mapClass.Map ) -> router.Router:
-  while (True): 
-    x = random.randint(0,map.columns)
-    y = random.randint(0,map.rows)
+def placeRouter(m: Map) -> router.Router:
+  tries = 100
+  while (tries): 
+    x = random.randint(0,m.columns)
+    y = random.randint(0,m.rows)
     routerCell = cell.Cell(x,y)
 
-    if checkValidRouter(map=map,cell=routerCell):
-      return router.Router(routerCell,map.rRange,map.rtPrice,map)
+    if checkValidRouter(m=m,cell=routerCell):
+      targets = m.computeRouterTargets(routerCell)
+      return router.Router(routerCell,m.rRange,m.rtPrice,targets)
+    tries -= 1
+  return router.Router(Cell(-1,-1),-1,-1,[])
 
-def checkValidRouter(map: mapClass.Map, cell:cell.Cell) -> bool:
-  return map.isTarget(cell=cell)
+def checkValidRouter(m: Map, cell:cell.Cell) -> bool:
+  return m.isTarget(cell=cell) and cell not in m.wired
 
-def getPath(map: mapClass.Map, router : router.Router) -> list[cell.Cell]:
-  result = bfs.bfs(map=map,start=map.backbone.cell,target=router.cell)
-  return result[1:-1]
-
-def randomSolution(map : mapClass.Map, seed) -> solution.Solution:
-  random.seed(seed)
+def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
+  if(seed != -1):
+    random.seed(seed)
   value = 0
-  routers = []
-  paths = dict()
 
+  # new_map : Map = Map(m.rows,m.columns,m.walls,m.voids,m.targets,m.backbone,m.budget,m.rtPrice,m.bbPrice,m.rRange,m.routers)
+  new_map = m
+  routers = []
+  current_paths = [m.backbone.cell] # targets
+  paths = {} # real paths
   # Budget must be less than price of a new router
-  while (value + map.rtPrice) < map.budget:
-    router = placeRouter(map)
+  while (value + new_map.rtPrice) < new_map.budget:
+    router = placeRouter(new_map)
+    # failed to place new router
+    if(router.cell == Cell(-1,-1)):
+      return solution.Solution(routers=routers, backbone_cells=paths)
+
     if router not in routers:
-      paths[router.cell] = getPath(map=map,router=router)
+      # m.backbone.connections[router.cell] = getPath(m=m,router=router)
+      path = bfs_to_backbone_cell(new_map,router.cell,current_paths)
+      current_paths = path + [router.cell]
+      paths[router.cell] = path
       routers.append(router)
-      value += map.rtPrice
-  return solution.Solution(routers=routers,paths=paths)
+      value += new_map.rtPrice
+  return solution.Solution(routers=routers, backbone_cells=paths)
