@@ -1,0 +1,12 @@
+algorithm: greedy
+map: rue_de_londres.in
+size: 2
+seed: 0
+probabilities:
+  Change: 0.5
+  Remove: 0.5
+  Add: 0.5
+  Nothing: 0.5
+constraints:
+  RouterInWalls: false
+  BackboneOutside: true
