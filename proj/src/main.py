@@ -24,7 +24,7 @@ class RouterPlacementGame:
         pygame.display.set_caption('Router Placement')
 
         # Game configuration
-        self.config = self.load_config('configs/default.yaml')
+        self.config = self.load_config('../configs/default.yaml')
         self.config['seed'] = int(time.time() * 1e9)
 
         # State variables
@@ -41,7 +41,7 @@ class RouterPlacementGame:
 
         # Load config if argument is provided
         if len(sys.argv) > 1:
-            self.config = self.load_config(f"configs/{sys.argv[1]}")
+            self.config = self.load_config(f"../configs/{sys.argv[1]}")
             self.state = STATE_ALGORITHM
 
     def load_config(self, config_file):
