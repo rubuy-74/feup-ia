@@ -1,0 +1,10 @@
+algorithm: greedy
+map: charleston_road.in
+seed: 0
+probabilities:
+  remove: 0.5
+  add: 0.5
+  nothing: 0.5
+constraints:
+  routerInWalls: false
+  backboneOutside: true

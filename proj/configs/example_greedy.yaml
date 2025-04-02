@@ -1,0 +1,11 @@
+algorithms: 
+  - greedy
+map: example.in
+seed: 
+probabilities:
+  remove: 0.4
+  add: 0.4
+  nothing: 0.2
+constraints:
+  routerInWalls: false
+  backboneOutside: true
