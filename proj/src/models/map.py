@@ -44,7 +44,7 @@ class Map:
   ####################### old stuff
 
   def __str__(self):
-    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.backbone) + ", " + str(self.walls) + ", " + str(self.voids) + ", " + str(self.targets) + "," + str(self.budget) +  "]"
+    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.backbone) + ", " +  str(self.budget) +  "]"
 
   def get_cost(self, solution: solution.Solution) -> int:
     return len(solution.getBackboneCellsInSet()) * self.bbPrice + len(solution.routers) * self.rtPrice

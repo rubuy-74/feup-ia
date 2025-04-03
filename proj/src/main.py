@@ -3,6 +3,8 @@ import pygame
 import time
 import yaml
 
+import numpy as np
+
 import utils
 import algorithms.randomSolution as randomSolution
 import algorithms.greedySolution as greedySolution
@@ -107,6 +109,8 @@ class RouterPlacementGame:
 
         if self.config['algorithm'] == 'random':
             m = naive.naive(m)
+            with open(f"../output/{self.config['map']}","w+") as file:
+                file.write(m.matrix.tolist().__str__())
             
         elif self.config['algorithm'] == 'greedy':
             sol = greedySolution.greedySolution(m)
