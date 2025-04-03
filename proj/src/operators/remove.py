@@ -15,7 +15,6 @@ def remove(s: Solution):
 
   new_bb_connections = s.backbone_cells.copy()
   
-  if(router_to_remove.cell in new_bb_connections):
-    del new_bb_connections[router_to_remove.cell]
+  del new_bb_connections[router_to_remove.cell]
 
   return Solution(new_bb_connections, new_routers)

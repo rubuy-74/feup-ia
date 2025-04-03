@@ -1,7 +1,7 @@
 import models.backbone as backbone
-import models.cell as cell
+from models.cell import Cell
 import models.map as mapClass
-from models.router import Router
+import numpy as np
 
 def parse(file):
   with open(file, "r") as f:
@@ -10,35 +10,30 @@ def parse(file):
     rows, columns, range_ = lines[0].split(" ")
     bb_cost, rt_cost, budget = lines[1].split(" ")
     bx, by = lines[2].split(" ")
-
-    t = set() # testing with sets for O(1)
-    v = set()
-    w = set()
-    b = backbone.Backbone(cell.Cell(int(bx), int(by)), int(bb_cost))
-    r = set()
+    
+    b = (int(bx), int(by))
+    
+    matrix = np.zeros((int(rows), int(columns)), dtype=np.int8)
     
     for i, line in enumerate(lines[3:]):
       for j, c in enumerate(line):
-        pos = cell.Cell(j, i)
         match c:
           case ".":
-            t.add(pos)
+            matrix[i, j] = Cell.TARGET
           case "-":
-            v.add(pos)
+            matrix[i, j] = Cell.VOID
           case "#":
-            w.add(pos)
+            matrix[i, j] = Cell.WALL
 
     return mapClass.Map(
       rows=int(rows),
       columns=int(columns),
-      walls=w,
-      voids=v,
-      targets=t,
       backbone=b,
       budget=int(budget),
       rtPrice=int(rt_cost),
       bbPrice=int(bb_cost),
       rRange=int(range_),
+      matrix=matrix
     )
   
 def convertDictToSet(d):
@@ -48,3 +43,23 @@ def convertDictToSet(d):
     result.update(item)
 
   return result
+
+def computeAdjacents(coords: tuple):
+  x, y = coords
+  
+  adjXpos = x + 1
+  adjXneg = x - 1
+  adjYpos = y + 1
+  adjYneg = y - 1
+  
+  # adjacent cells in clockwise order starting from top-left corner
+  return [
+    (adjXneg, y),
+    (adjXpos, y),
+    (x, adjYneg), 
+    (x, adjYpos),
+    (adjXneg, adjYneg),
+    (adjXpos, adjYneg), 
+    (adjXpos, adjYpos), 
+    (adjXneg, adjYpos), 
+  ]

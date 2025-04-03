@@ -1,7 +1,7 @@
 import models.solution as solution
 import models.router as router
 import models.cell as cell
-from algorithms.bfs import bfs_to_backbone_cell
+from algorithms.bfs import bfs
 from models.map import Map
 from models.cell import Cell
 import random
@@ -34,8 +34,10 @@ def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
   # new_map : Map = Map(m.rows,m.columns,m.walls,m.voids,m.targets,m.backbone,m.budget,m.rtPrice,m.bbPrice,m.rRange,m.routers)
   new_map = m
   routers = []
-  current_paths = [m.backbone.cell] # targets
   paths = {} # real paths
+  
+  last_path = []
+  last_cell = m.backbone.cell
   # Budget must be less than price of a new router
   while (value + new_map.rtPrice) < new_map.budget:
     router = placeRouter(new_map, wired)
@@ -46,9 +48,12 @@ def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
 
     if router not in routers:
       # m.backbone.connections[router.cell] = getPath(m=m,router=router)
-      path = bfs_to_backbone_cell(new_map,router.cell,current_paths)
-      current_paths = path + [router.cell]
-      paths[router.cell] = path
+      path = bfs(new_map, router.cell, last_cell)
+      last_path += path
+      paths[router.cell] = last_path
+      last_cell = router.cell
+      
+      
       routers.append(router)
       value += new_map.rtPrice
       wired.update(router.coverage)

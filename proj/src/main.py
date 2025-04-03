@@ -8,7 +8,8 @@ import algorithms.randomSolution as randomSolution
 import algorithms.greedySolution as greedySolution
 import menu.draw as draw
 import menu.ui as ui
-import models.map as mapClass
+import algorithms.genetic_solution as geneticSolution
+import algorithms.naive as naive
 
 # Game States
 STATE_MENU = 'MENU'
@@ -105,15 +106,16 @@ class RouterPlacementGame:
         draw.draw_map(self.screen, m, self.config['size'])
 
         if self.config['algorithm'] == 'random':
-            sol = randomSolution.randomSolution(m, self.config['seed'])
+            m = naive.naive(m)
+            
         elif self.config['algorithm'] == 'greedy':
             sol = greedySolution.greedySolution(m)
         else:
             self.state = STATE_NOT_IMPLEMENTED
             return
 
-        if sol:
-            draw.draw_solution(self.screen, m, sol, self.config['size'])
+        if m:
+            draw.draw_solution(self.screen, m, self.config['size'])
         self.state = STATE_FROZEN
 
 

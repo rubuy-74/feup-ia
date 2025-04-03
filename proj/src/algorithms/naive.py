@@ -1,0 +1,93 @@
+from models.map import Map
+from models.cell import Cell
+import numpy as np
+from skimage.morphology import medial_axis
+from random import shuffle
+from collections import deque
+from utils import computeAdjacents
+
+def naive(m: Map):
+  to_check = np.where(m.matrix == Cell.TARGET, 1, 0).astype(np.bool_)
+  budget = m.budget
+  
+  while budget > 0:
+    abstraction = medial_axis(to_check)
+    coverage = np.argwhere(abstraction > 0).tolist()
+    
+    if not len(coverage):
+      break
+    
+    shuffle(coverage)
+  
+    x, y = coverage[0]
+    m.matrix[x, y] = Cell.ROUTER
+    
+    temp, passed_budget, cost = connect_to_backbone(m, (x, y), budget)
+    
+    if not passed_budget:
+      break
+    
+    m = temp
+    
+    budget -= cost
+    
+    router_targets = m.computeRouterTargets((x,y))
+    
+    for wired_cell in router_targets:
+      to_check[wired_cell] = True
+  
+  print("ending")
+  
+  return m
+      
+    
+def connect_to_backbone(m: Map, router: Cell, budget: int):
+  path = bfs(m, router)
+  cost = m.get_path_cost(path)
+  
+  temp = m
+  
+  if cost <= budget:
+    for cell in path:
+      if temp.matrix[cell] == Cell.ROUTER:
+        temp.matrix[cell] = Cell.CONNECTED_ROUTER
+      else:
+        temp.matrix[cell] = Cell.CABLE
+      
+    return temp, True, cost
+
+  return temp, False, cost
+
+
+def bfs(m: Map, begin: tuple):
+  visited = np.zeros((m.rows, m.columns), dtype=np.bool_)
+  parent = [[-1] * m.columns for _ in range(m.rows)]
+  
+  queue = deque()
+  queue.append(begin)
+  visited[begin[0]][begin[1]] = True
+  
+  while queue:
+    current_cell = queue.popleft()
+    
+    if m.matrix[current_cell] == Cell.CONNECTED_ROUTER or m.matrix[current_cell] == Cell.CABLE or current_cell == m.backbone:
+      path = []
+      curr_backtrack = current_cell
+      while curr_backtrack != begin:
+        path.append(curr_backtrack)
+        curr_backtrack = parent[curr_backtrack[0]][curr_backtrack[1]]
+      path.append(curr_backtrack)
+      
+      return path[1:]
+    
+    for adj in computeAdjacents(current_cell):
+      x, y = adj
+      if 0 <= x < m.rows and 0 <= y < m.columns:
+        if not visited[x][y]:
+          queue.append(adj)
+          visited[x][y] = True
+          parent[x][y] = current_cell
+  
+  
+ 
+  return None

@@ -19,12 +19,12 @@ def add(s: Solution, m: Map):
     if m.get_cost(s) + (m.bbPrice * len(path)) > m.budget:
        return s
     
-    new_router = Router(new_cell, m.rRange, m.rtPrice, [])
+    new_router = Router(new_cell, m.rRange, m.rtPrice, m.computeRouterTargets(new_cell))
 
     new_routers = s.routers.copy()
     new_routers.add(new_router)
 
-    new_bb_connections = m.backbone.connections.copy()
+    new_bb_connections = s.backbone_cells.copy()
     new_bb_connections[new_cell] = path
 
     return Solution(new_bb_connections, new_routers)

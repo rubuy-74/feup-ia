@@ -1,4 +1,14 @@
 class Cell:
+  BACKBONE = 0
+  VOID = 1
+  WALL = 2
+  TARGET = 3
+  WIRED = 4
+  ROUTER = 5
+  CONNECTED_ROUTER = 6
+  AFFECTED_ROUTER = 7 
+  CABLE = 8
+  
   def __init__(self, x: int, y: int):
     self.x = x
     self.y = y

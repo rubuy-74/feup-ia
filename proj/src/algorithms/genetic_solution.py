@@ -1,15 +1,17 @@
+from time import process_time
 from models.solution import Solution
 from models.map import Map
 from algorithms.functions import crossover_func,mutation_func
 from algorithms.randomSolution import randomSolution
+from algorithms.greedySolution import greedySolution
 import random
 
 # CONSTANTS
-POPULATION_SIZE = 10
+POPULATION_SIZE = 5
 MUTATION_PROBABILITY = 0.05
 
 def most_fit(m: Map,population: list[Solution]) -> Solution:
-  return sorted(population, lambda solution : m.evaluate(solution),reverse=True)[0]
+  return sorted(population, key=lambda solution : m.evaluate(solution),reverse=True)[0]
 
 
 def generate_population(m : Map) -> list[Solution]:
@@ -19,22 +21,30 @@ def generate_population(m : Map) -> list[Solution]:
     population.append(solution)
   return population
 
-def genetic_algorithm(m: Map, num_iterations=100) -> Solution:
+def genetic_algorithm(m: Map, num_iterations=10) -> Solution:
+  time = process_time()
   population = generate_population(m)
-  while(num_iterations > 0):
+  while num_iterations > 0:
     # create new children
     new_population = []
-    for _ in range(population):
-      second_parent = most_fit(m,population)
+    for _ in range(len(population)):
+      second_parent = most_fit(m, population)
       first_parent = random.choice(population)
-      child = crossover_func(first_parent,second_parent)
+      child = crossover_func(m, first_parent, second_parent)
 
-      #random mutate
+      # random mutate
       if(random.random() <= MUTATION_PROBABILITY):
-        child = mutation_func(m,child)
+        child = mutation_func(m, child)
+      
+      print("one population passed")
 
       new_population.append(child)
+    
     population = new_population
-
     num_iterations -= 1
-    return most_fit(m,population)
+    print("one iteration passed", num_iterations / 10 * 100)
+    
+    
+  time2 = process_time()
+  print("ending with time:", time2 - time)
+  return most_fit(m,population)

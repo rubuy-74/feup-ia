@@ -18,17 +18,50 @@ def mutation_func(m: mapClass.Map,
 
   # adds a new router and path to solution
   if action == "add":
-    # print("adding")
+    print("adding")
     return add.add(solution,m)
 
   # remove random path from the solution
   if action == "remove":
-    # print("remving")
+    print("remving")
     return remove.remove(solution)
 
   return solution
 
 
-def crossover_func(first: Solution, second : Solution) -> Solution:
-  pass
+def crossover_func(m: mapClass.Map, first: Solution, second: Solution) -> Solution:
+  current_value = 0
+  routers = set()
+  
+  new_bb_cells = {}
+  bb_cells = set()
+  
+  while current_value <= m.budget:
+    which_parent_to_choose = random.randint(1, 2)
+    
+    if current_value + m.rtPrice > m.budget:
+      break
+    
+    if which_parent_to_choose == 1 and len(first.routers) > 0:
+      router = first.routers.pop()
+      
+      routers.add(router)
+      
+      new_bb_cells[router.cell] = first.backbone_cells[router.cell]
+      bb_cells.update(first.backbone_cells[router.cell])
+      
+    else:
+      if len(second.routers) < 1:
+       break
+     
+      router = second.routers.pop()
+     
+      routers.add(router)
+      new_bb_cells[router.cell] = second.backbone_cells[router.cell]
+      bb_cells.update(second.backbone_cells[router.cell])
+      
+  
+    current_value = len(bb_cells) * m.bbPrice + len(routers) * m.rtPrice
+      
+  return Solution(routers=routers, backbone_cells=new_bb_cells)
   
