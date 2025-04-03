@@ -27,8 +27,6 @@ def parse(file):
             v.add(pos)
           case "#":
             w.add(pos)
-          case "r":
-            r.add(Router(pos, range_, rt_cost, []))
 
     return mapClass.Map(
       rows=int(rows),
@@ -41,7 +39,6 @@ def parse(file):
       rtPrice=int(rt_cost),
       bbPrice=int(bb_cost),
       rRange=int(range_),
-      routers=r
     )
   
 def convertDictToSet(d):

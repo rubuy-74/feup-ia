@@ -5,7 +5,7 @@ from models.solution import Solution
 import math
 import random
 
-def simulated_annealing(m : Map,initial_temp=1000,cooling_rate=0.995,stopping_temp=1e-8,max_iterations=10000):
+def simulated_annealing(m: Map, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, max_iterations=10000):
   solutions = []
 
   # Create initial solution

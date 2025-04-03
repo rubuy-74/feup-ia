@@ -31,3 +31,4 @@ def mutation_func(m: mapClass.Map,
 
 def crossover_func(first: Solution, second : Solution) -> Solution:
   pass
+  

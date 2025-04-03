@@ -8,26 +8,28 @@ import random
 
 import utils as utils
 
-def placeRouter(m: Map) -> router.Router:
+def placeRouter(m: Map,wired: set[cell.Cell]) -> router.Router:
   tries = 100
   while (tries): 
     x = random.randint(0,m.columns)
     y = random.randint(0,m.rows)
     routerCell = cell.Cell(x,y)
 
-    if checkValidRouter(m=m,cell=routerCell):
+    if checkValidRouter(m=m,cell=routerCell,wired=wired):
       targets = m.computeRouterTargets(routerCell)
       return router.Router(routerCell,m.rRange,m.rtPrice,targets)
     tries -= 1
-  return router.Router(Cell(-1,-1),-1,-1,[])
+  return router.Router(Cell(-1,-1),-1,-1, [])
 
-def checkValidRouter(m: Map, cell:cell.Cell) -> bool:
-  return m.isTarget(cell=cell) and cell not in m.wired
+def checkValidRouter(m: Map, cell:cell.Cell, wired: set[cell.Cell]) -> bool:
+  return m.isTarget(cell=cell) and cell not in wired
 
 def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
   if(seed != -1):
     random.seed(seed)
   value = 0
+  
+  wired = set()
 
   # new_map : Map = Map(m.rows,m.columns,m.walls,m.voids,m.targets,m.backbone,m.budget,m.rtPrice,m.bbPrice,m.rRange,m.routers)
   new_map = m
@@ -36,10 +38,11 @@ def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
   paths = {} # real paths
   # Budget must be less than price of a new router
   while (value + new_map.rtPrice) < new_map.budget:
-    router = placeRouter(new_map)
+    router = placeRouter(new_map, wired)
     # failed to place new router
     if(router.cell == Cell(-1,-1)):
       return solution.Solution(routers=routers, backbone_cells=paths)
+    
 
     if router not in routers:
       # m.backbone.connections[router.cell] = getPath(m=m,router=router)
@@ -48,4 +51,6 @@ def randomSolution(m: Map, seed : int = -1) -> solution.Solution:
       paths[router.cell] = path
       routers.append(router)
       value += new_map.rtPrice
+      wired.update(router.coverage)
+      
   return solution.Solution(routers=routers, backbone_cells=paths)

@@ -14,15 +14,12 @@ class Map:
               budget: int, 
               rtPrice: int, 
               bbPrice: int,
-              rRange: int,
-              routers: set[cell.Cell]):
+              rRange: int):
       self.rows = rows
       self.columns = columns
       self.walls = walls
       self.voids = voids
       self.targets = targets
-      self.routers = routers
-      self.wired = set()
       self.backbone = backbone
       self.budget = budget
       self.rtPrice = rtPrice
@@ -30,7 +27,7 @@ class Map:
       self.rRange = rRange
 
   def __str__(self):
-    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.backbone) + ", " + str(self.walls) + ", " + str(self.voids) + ", " + str(self.targets) + ", " + str(self.wired) + "," + str(self.budget) +  "]"
+    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.backbone) + ", " + str(self.walls) + ", " + str(self.voids) + ", " + str(self.targets) + "," + str(self.budget) +  "]"
 
   def isWall(self,cell: cell.Cell):
     return cell in self.walls
@@ -41,16 +38,13 @@ class Map:
   def isVoid(self,cell: cell.Cell):
     return cell in self.voids
 
-  def isWired(self,cell: cell.Cell):
-    return cell in self.wired
-
   def isBackbone(self,cell: cell.Cell):
     return cell == self.backbone.cell
 
   def get_cost(self, solution: solution.Solution) -> int:
     return len(solution.backbone_cells) * self.bbPrice + len(solution.routers) * self.rtPrice
 
-  def evaluate(self,solution: solution.Solution) -> int:
+  def evaluate(self, solution: solution.Solution) -> int:
     #print("Routers:", solution.routers)
     #print("BB cells:", solution.backbone_cells)
 
@@ -58,16 +52,15 @@ class Map:
 
     return 1000 * len(solution.computeCoverage()) + ( self.budget - cost )
 
-  def computeRouterTargets(self, routerCell:cell.Cell) -> list[cell.Cell]:
-    targets = []
+  def computeRouterTargets(self, routerCell:cell.Cell) -> set[cell.Cell]:
+    targets = set()
     rules = getWallRules(self, routerCell)
     
     for i in range(max(0, routerCell.y - self.rRange), min(self.rows, routerCell.y + self.rRange + 1)):
           for j in range(max(0, routerCell.x - self.rRange), min(self.columns, routerCell.x + self.rRange + 1)):
               newCell = cell.Cell(j, i)
               if not checkOutsideWallArea(cell=newCell, rules=rules): # not n^3 as len(rules) is not that big
-                  targets.append(newCell)
-                  self.wired.add(newCell)            
+                  targets.add(newCell)  
 
     return targets
   

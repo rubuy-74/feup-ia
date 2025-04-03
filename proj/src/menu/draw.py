@@ -1,5 +1,7 @@
 import pygame
 
+from models.solution import Solution
+
 def draw_pixel(screen, x, y, color, size):
     pygame.draw.rect(screen, color, (x * size, y * size, size, size))
 
@@ -19,7 +21,7 @@ def draw_map(screen, m, size):
     
     pygame.display.flip()
 
-def draw_solution(screen, m, sol, size):
+def draw_solution(screen, m, sol: Solution, size):
     colors = {
         'target_router': (0, 255, 0),
         'backbone': (255, 0, 0),
@@ -27,7 +29,7 @@ def draw_solution(screen, m, sol, size):
         'path': (157, 0, 255),
     }
 
-    for cell in m.wired:
+    for cell in sol.computeCoverage():
         draw_pixel(screen, cell.x, cell.y, colors['target_router'], size)
     for cell in m.walls:
         draw_pixel(screen, cell.x, cell.y, (128, 128, 128), size)
