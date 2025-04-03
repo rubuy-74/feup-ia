@@ -1,19 +1,17 @@
-from models.solution import Solution
 from models.map import Map
 from algorithms.functions import mutation_func
 
 #TODO: Change number of iterations to time
-def hillclimb(solution: Solution, m: Map, it: int):
+def hillclimb(m: Map, remaining_budget: int, it: int):
   for _ in range(it):
-    new_solution = mutation_func(m,solution)
-    new_solution_value = m.evaluate(new_solution)
-    solution_value = m.evaluate(solution)
+    new_map, new_budget = mutation_func(m, remaining_budget)
+    
+    #TODO: EVALUATE
+    new_map_value = new_map.evaluate(remaining_budget)
+    old_map_value = m.evaluate(remaining_budget) 
 
-    print(solution_value, new_solution_value)
+    if(new_map_value >= old_map_value):
+      m = new_map_value
+      remaining_budget = new_budget
 
-    if(new_solution_value >= solution_value):
-      for router in (new_solution.routers.difference(solution.routers)):
-        router.coverage = m.computeRouterTargets(router.cell)
-      solution = new_solution
-
-  return solution
+  return m

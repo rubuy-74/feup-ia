@@ -1,6 +1,4 @@
 import models.cell as cell
-import models.backbone as backbone
-import models.solution as solution
 import numpy as np
 from models.cell import Cell
 
@@ -24,10 +22,29 @@ class Map:
       self.rRange = rRange
       self.backbone = backbone
       self.matrix = matrix
+      self.coverage = set()
       
+  def isWall(self, coords: tuple):
+    return self.matrix[coords] == Cell.WALL
+  
+  def isBackBone(self, coords: tuple):
+    return coords == self.backbone
+
+  def isCable(self, coords: tuple):
+    return self.matrix[coords] == Cell.CABLE
+  
+  def isRouter(self, coords: tuple):
+    return self.matrix[coords] in [Cell.ROUTER, Cell.CONNECTED_ROUTER, Cell.AFFECTED_ROUTER]
+  
+  def isVoid(self, coords: tuple):
+    return self.matrix[coords] == Cell.VOID
+  
   def get_path_cost(self, path: list):
     return len(path) * self.bbPrice + self.rtPrice
-      
+    
+  def evaluate(self, remaining_budget: int):
+    return 1000 * len(self.coverage) + remaining_budget
+  
   def computeRouterTargets(self, routerCell: tuple):
     x, y = routerCell
     
@@ -37,26 +54,10 @@ class Map:
     for i in range(max(0, x - self.rRange), min(self.rows, x + self.rRange + 1)):
       for j in range(max(0, y - self.rRange), min(self.columns, y + self.rRange + 1)):
         newCell = (i, j)
-        if not checkOutsideWallArea(cell=newCell, rules=rules) and self.matrix[newCell] == Cell.TARGET: # not n^3 as len(rules) is not that big
+        if not checkOutsideWallArea(cell=newCell, rules=rules): # not n^3 as len(rules) is not that big
           targets.add(newCell)
 
     return targets
-  ####################### old stuff
-
-  def __str__(self):
-    return "[" + str(self.rows) + ", " + str(self.columns) + ", " + str(self.backbone) + ", " +  str(self.budget) +  "]"
-
-  def get_cost(self, solution: solution.Solution) -> int:
-    return len(solution.getBackboneCellsInSet()) * self.bbPrice + len(solution.routers) * self.rtPrice
-
-  def evaluate(self, solution: solution.Solution) -> int:
-    #print("Routers:", solution.routers)
-    #print("BB cells:", solution.backbone_cells)
-
-    cost = self.get_cost(solution)
-
-    return 1000 * len(solution.computeCoverage()) + (self.budget - cost)
-
   
 def checkOutsideWallArea(cell: tuple, rules: list[tuple]):
   # (1, 2, 3, 4) for a cell to be hided in the wall area, it must have:

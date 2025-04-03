@@ -1,4 +1,3 @@
-import models.backbone as backbone
 from models.cell import Cell
 import models.map as mapClass
 import numpy as np
@@ -11,7 +10,7 @@ def parse(file):
     bb_cost, rt_cost, budget = lines[1].split(" ")
     bx, by = lines[2].split(" ")
     
-    b = (int(bx), int(by))
+    b = (int(by), int(bx))
     
     matrix = np.zeros((int(rows), int(columns)), dtype=np.int8)
     

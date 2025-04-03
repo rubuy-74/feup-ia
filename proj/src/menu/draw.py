@@ -27,7 +27,7 @@ def draw_solution(screen, m: Map, size):
         Cell.VOID: (255, 255, 255),
         Cell.WALL: (128, 128, 128),
         Cell.TARGET: (255, 255, 0),
-        Cell.BACKBONE: (255, 0, 0),
+        Cell.BACKBONE: (0, 0, 0),
         Cell.CONNECTED_ROUTER: (0, 0, 255),
         Cell.CABLE: (157, 0, 255),
         Cell.WIRED: (0, 255, 0),
@@ -37,18 +37,20 @@ def draw_solution(screen, m: Map, size):
 
     for y in range(m.rows):
         for x in range(m.columns):
-            cell_type = m.matrix[y, x]
             
-            if cell_type == Cell.CONNECTED_ROUTER:
-                coverage.update(m.computeRouterTargets((y,x)))
+            if (y, x) == m.backbone:
+                draw_pixel(screen, x, y, colors[Cell.BACKBONE], size)
+                continue
+            
+            cell_type = m.matrix[y, x]
             
             if cell_type in colors:
                 draw_pixel(screen, x, y, colors[cell_type], size)
                 
 
-    for coords in coverage:
+    for coords in m.coverage:
         x, y = coords
-        if m.matrix[x, y] != Cell.CONNECTED_ROUTER and m.matrix[x, y] != Cell.CABLE:
+        if m.matrix[x, y] != Cell.CONNECTED_ROUTER and m.matrix[x, y] != Cell.CABLE and (x,y) != m.backbone:
             draw_pixel(screen, y, x, colors[Cell.WIRED], size)
     
     pygame.display.flip()

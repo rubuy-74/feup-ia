@@ -2,6 +2,7 @@ from models.map import Map
 from models.cell import Cell
 import numpy as np
 from skimage.morphology import medial_axis
+from tqdm import tqdm
 from random import shuffle
 from collections import deque
 from utils import computeAdjacents
@@ -9,6 +10,9 @@ from utils import computeAdjacents
 def naive(m: Map):
   to_check = np.where(m.matrix == Cell.TARGET, 1, 0).astype(np.bool_)
   budget = m.budget
+  
+  max_num_routers = int(m.budget / m.rtPrice)
+  pbar = tqdm(range(max_num_routers), desc="Placing Routers")
   
   while budget > 0:
     abstraction = medial_axis(to_check)
@@ -20,6 +24,10 @@ def naive(m: Map):
     shuffle(coverage)
   
     x, y = coverage[0]
+    
+    if m.matrix[x][y] == Cell.CABLE:
+      continue
+    
     m.matrix[x, y] = Cell.ROUTER
     
     temp, passed_budget, cost = connect_to_backbone(m, (x, y), budget)
@@ -33,11 +41,15 @@ def naive(m: Map):
     
     router_targets = m.computeRouterTargets((x,y))
     
-    for wired_cell in router_targets:
-      to_check[wired_cell] = True
-  
-  print("ending")
-  
+    m.coverage.update(router_targets)
+    
+    for target in router_targets:
+      tx, ty = target
+      to_check[tx, ty] = 0
+          
+    pbar.update()
+    
+  pbar.close()
   return m
       
     
