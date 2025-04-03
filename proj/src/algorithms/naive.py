@@ -50,7 +50,7 @@ def naive(m: Map):
     pbar.update()
     
   pbar.close()
-  return m
+  return m, budget
       
     
 def connect_to_backbone(m: Map, router: Cell, budget: int):
@@ -100,6 +100,4 @@ def bfs(m: Map, begin: tuple):
           visited[x][y] = True
           parent[x][y] = current_cell
   
-  
- 
   return None
