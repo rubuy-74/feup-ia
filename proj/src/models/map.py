@@ -1,4 +1,4 @@
-import models.cell as cell
+import copy
 import numpy as np
 from models.cell import Cell
 
@@ -22,10 +22,11 @@ class Map:
       self.rRange = rRange
       self.backbone = backbone
       self.matrix = matrix
+      self.original = copy.deepcopy(matrix)
       self.coverage = set()
       
   def isWall(self, coords: tuple):
-    return self.matrix[coords] == Cell.WALL
+    return self.original[coords] == Cell.WALL
   
   def isBackBone(self, coords: tuple):
     return coords == self.backbone
@@ -37,7 +38,7 @@ class Map:
     return self.matrix[coords] in [Cell.ROUTER, Cell.CONNECTED_ROUTER, Cell.AFFECTED_ROUTER]
   
   def isVoid(self, coords: tuple):
-    return self.matrix[coords] == Cell.VOID
+    return self.original[coords] == Cell.VOID
   
   def get_path_cost(self, path: list):
     return len(path) * self.bbPrice + self.rtPrice
@@ -86,7 +87,7 @@ def getWallRules(m: Map, router: tuple):
           if i == x and j == y:
               continue
           newCell = (i, j)
-          if m.matrix[newCell] == Cell.WALL:
+          if m.original[newCell] == Cell.WALL:
               rules.append(createWallArea(router, newCell))
 
   return rules

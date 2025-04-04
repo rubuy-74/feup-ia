@@ -33,11 +33,8 @@ def draw_solution(screen, m: Map, size):
         Cell.WIRED: (0, 255, 0),
     }
 
-    coverage = set()
-
     for y in range(m.rows):
         for x in range(m.columns):
-            
             if (y, x) == m.backbone:
                 draw_pixel(screen, x, y, colors[Cell.BACKBONE], size)
                 continue
@@ -50,7 +47,7 @@ def draw_solution(screen, m: Map, size):
 
     for coords in m.coverage:
         x, y = coords
-        if m.matrix[x, y] != Cell.CONNECTED_ROUTER and m.matrix[x, y] != Cell.CABLE and (x,y) != m.backbone:
+        if m.matrix[x, y] != Cell.CONNECTED_ROUTER and m.matrix[x, y] != Cell.CABLE and (x,y) != m.backbone and m.matrix[x, y] != Cell.WALL:
             draw_pixel(screen, y, x, colors[Cell.WIRED], size)
     
     pygame.display.flip()

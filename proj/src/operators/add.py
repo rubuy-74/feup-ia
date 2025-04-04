@@ -48,10 +48,7 @@ def remove(m: Map, current_budget: int):
    adjs = computeAdjacents((x, y))
    connected_adjs = list(filter(lambda x: m.isCable(x) or m.isBackBone(x) or m.isRouter(x), adjs))
    
-   if len(connected_adjs) == 3:
-      m.matrix[x, y] = Cell.TARGET
-      current_budget += m.rtPrice
-   elif len(connected_adjs) == 2:
+   if len(connected_adjs) >= 2:
       m.matrix[x, y] = Cell.CABLE
       current_budget += m.rtPrice - m.bbPrice
    else:
@@ -59,7 +56,10 @@ def remove(m: Map, current_budget: int):
       path_until_interception = bfs_until_interception(m, (x, y))
       
       for cell in path_until_interception[:-1]:
-         m.matrix[cell] = Cell.TARGET
+         if m.original[cell] != Cell.WALL:
+            m.matrix[cell] = Cell.TARGET
+         else:
+            m.matrix[cell] = Cell.WALL
       
    new_coverage = set()
       

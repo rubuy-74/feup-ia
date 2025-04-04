@@ -1,52 +1,62 @@
-from algorithms.randomSolution import randomSolution
+from algorithms.naive import naive
 from algorithms.functions import mutation_func
 from models.map import Map
-from models.solution import Solution
 import math
 import random
+import copy
 
-def simulated_annealing(m: Map, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, max_iterations=10000):
+def simulated_annealing(m: Map, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, max_iterations=500):
   solutions = []
 
-  # Create initial solution
-  current_solution : Solution = randomSolution(m)
-  best_solution = current_solution
-  best_solution_value = m.evaluate(current_solution)
+  current_map, remaining_budget = naive(m)
+  best_map = copy.deepcopy(current_map)
+  best_map_value = current_map.evaluate(remaining_budget)
 
-  # Auxiliary variables
+  temporary = best_map_value
+
   temp = initial_temp
   iteration = 0
-  num_repetitions = 100
+  no_improvement_count = 0
+  max_no_improvement = 2000
 
   while temp > stopping_temp and iteration < max_iterations:
-    # Create mutated solution
-    new_solution = mutation_func(m,current_solution)
-    current_solution_value = m.evaluate(current_solution)
-    new_solution_value = m.evaluate(new_solution)
-    
-    # if better accept it
-    if(num_repetitions == 0): # TODO: Repeat if reaches a stop point
-      return best_solution,best_solution_value,solutions
-    if(current_solution == best_solution):
-      num_repetitions -= 1
 
-    if new_solution_value > current_solution_value:
-      current_solution = new_solution
-      current_solution_value = new_solution_value
+    new_map, new_budget, _ = mutation_func(current_map, remaining_budget)
+    current_map_value = current_map.evaluate(remaining_budget)
+    new_map_value = new_map.evaluate(new_budget)
 
-      if current_solution_value > best_solution_value:
-        best_solution = new_solution
-        best_solution_value = current_solution_value
+    if new_map_value > current_map_value:
+      current_map = copy.deepcopy(new_map)
+      current_map_value = new_map_value
+      remaining_budget = new_budget
+
+      if current_map_value > best_map_value:
+        best_map = copy.deepcopy(new_map)
+        best_map_value = current_map_value
+        no_improvement_count = 0
+        
+        print("ACCEPTING BEST SOLUTION:", best_map_value)
+        
     else: # if worse, accept it with a probability
-      delta = current_solution_value - new_solution_value
-      probability = math.exp(-delta/temp)
+      delta = new_map_value - current_map_value
+      probability = math.exp(delta / temp)
 
       if random.random() < probability:
-        current_solution = new_solution
-        current_solution_value = new_solution_value
+        current_map = copy.deepcopy(new_map)
+        current_map_value = new_map_value
+        remaining_budget = new_budget
 
-    solutions.append(current_solution)
-    print(current_solution_value)
-    temp *= cooling_rate
+    solutions.append(current_map)
+    
+    temp *= cooling_rate * 0.8
     iteration += 1
-  return best_solution,best_solution_value,solutions
+    no_improvement_count += 1
+    
+    print("CURRENT SOLUTION:", current_map_value)
+    
+    if no_improvement_count >= max_no_improvement:
+      break
+    
+    
+  print("DIFFERENCE:", best_map_value - temporary)
+  return best_map, best_map_value, solutions

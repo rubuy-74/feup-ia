@@ -20,7 +20,6 @@ def mutation_func(m: Map,
 
   # remove random path from the solution
   if action == "remove":
-    
     return add.remove(m, current_budget)
     
 

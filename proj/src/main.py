@@ -4,6 +4,7 @@ import time
 import yaml
 
 import numpy as np
+from tqdm import tqdm
 
 import utils
 import algorithms.greedySolution as greedySolution
@@ -11,6 +12,7 @@ import menu.draw as draw
 import menu.ui as ui
 import algorithms.naive as naive
 import algorithms.hillclimb as hillclimb
+from algorithms.simulatedAnnealing import simulated_annealing
 
 # Game States
 STATE_MENU = 'MENU'
@@ -107,23 +109,10 @@ class RouterPlacementGame:
         draw.draw_map(self.screen, m, self.config['size'])
 
         if self.config['algorithm'] == 'random':
-            m, remaining_budget = naive.naive(m)
             with open(f"../output/{self.config['map']}","w+") as file:
                 file.write(m.matrix.tolist().__str__())
             
-            before = m.evaluate(remaining_budget)
-            
-            print("before:", before)
-                
-            for _ in range(1000):
-                m, remaining_budget = hillclimb.hillclimb(m, remaining_budget, 1)
-                
-                draw.draw_solution(self.screen, m, self.config['size'])
-            
-            after = m.evaluate(remaining_budget)
-            
-            print("ended hill:", after)
-            print("DIFFERENCE:", after - before)
+            m, _, _ = simulated_annealing(m)
             
             
         elif self.config['algorithm'] == 'greedy':
