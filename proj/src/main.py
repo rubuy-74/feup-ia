@@ -5,14 +5,17 @@ import yaml
 
 import numpy as np
 from tqdm import tqdm
+import matplotlib
+matplotlib.use('Agg')  # Use a non-GUI backend
+import matplotlib.pyplot as plt
 
 from algorithms.genetic import genetic, crossover
 import utils
 import algorithms.greedySolution as greedySolution
 import menu.draw as draw
 import menu.ui as ui
-import algorithms.naive as naive
-import algorithms.hillclimb as hillclimb
+from algorithms.naive import naive
+from algorithms.hillclimb import hillclimb
 from algorithms.simulatedAnnealing import simulated_annealing
 from models.cell import Cell
 import copy
@@ -44,8 +47,8 @@ class RouterPlacementGame:
         # Define options
         self.texts = ['Simple Example', 'Charleston Road', 'Lets Go Higher', 'Opera', 'Rue De Londres']
         self.file_options = ['example.in', 'charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
-        self.algorithms = ['Random', 'Greedy', 'Hill Climbing', 'Simulated Annealing', 'Tabu Search', 'Genetic Algorithm']
-        self.algorithms_config = ['random', 'greedy', 'hill_climbing', 'simulated_annealing', 'tabu_search', 'genetic_algorithm']
+        self.algorithms = ['Naive', 'Hill Climbing', 'Simulated Annealing' , 'Genetic Algorithm']
+        self.algorithms_config = ['naive', 'hillclimbing', 'simulated_annealing', 'genetic_algorithm']
 
         # Load config if argument is provided
         if len(sys.argv) > 1:
@@ -109,30 +112,43 @@ class RouterPlacementGame:
     def execute_algorithm(self):
         m = utils.parse("../maps/" + self.config['map'])
         self.screen.fill((0, 0, 0))
-        sol = None
-        draw.draw_map(self.screen, m, self.config['size'])
+        values = [] 
 
-        if self.config['algorithm'] == 'random':
-            with open(f"../output/{self.config['map']}","w+") as file:
-                file.write(m.matrix.tolist().__str__())
-            
+        if(self.config['map'] == 'lets_go_higher.in'):
+            m = utils.parse("../output/" + self.config['map'])
+
+        else:
+            draw.draw_map(self.screen, m, self.config['size'])
+        if self.config['algorithm'] == 'naive':
+            #  m, best_map_value, solutions = simulated_annealing(m)
+            solutions = []
+            m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
+        elif self.config['algorithm'] == 'hillclimbing':
+            m, remaining_budget = naive(m, self.config['map'] == 'lets_go_higher.in')
+            m, remaining_budget, solutions = hillclimb(m,remaining_budget,100)
+            values = solutions
+        elif self.config['algorithm'] == 'simulated_annealing':
+            current_map, remaining_budget = naive(m,self.config['map'] == 'lets_go_higher.in')
+            m, remaining_budget, solutions = simulated_annealing(current_map,remaining_budget=remaining_budget,max_iterations=100)
+            values = list(map(lambda x: x.evaluate(0),solutions))
+        elif self.config['algorithm'] == 'genetic_solution':
+            # m, _, solutions = genetic_solution(m)
             m, remaining_budget = genetic(m)
-            
-            routers = np.sum(m.matrix == Cell.CONNECTED_ROUTER)
-            cables = np.sum(m.matrix == Cell.CABLE)
-            
-            print(routers * m.rtPrice + cables * m.bbPrice + remaining_budget)
-            
-            print("FINAL SCORE:", m.evaluate(remaining_budget))
-            
-        elif self.config['algorithm'] == 'greedy':
-            sol = greedySolution.greedySolution(m)
+            values = list(map(lambda x: x.evaluate(0),m))
         else:
             self.state = STATE_NOT_IMPLEMENTED
             return
 
         if m:
             draw.draw_solution(self.screen, m, self.config['size'])
+            if(len(solutions) > 0):
+                plt.plot(range(len(values)),values,marker='o')
+                plt.xlabel('Index')
+                plt.ylabel('Index')
+
+                plt.grid(True)
+                plt.savefig(f'../output/{self.config['map'][:-3]}_{self.config['algorithm']}.png')
+            
         self.state = STATE_FROZEN
 
 

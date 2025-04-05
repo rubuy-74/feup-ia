@@ -2,6 +2,7 @@ from models.cell import Cell
 import models.map as mapClass
 import numpy as np
 
+
 def parse(file):
   with open(file, "r") as f:
     lines = f.readlines()
@@ -23,6 +24,10 @@ def parse(file):
             matrix[i, j] = Cell.VOID
           case "#":
             matrix[i, j] = Cell.WALL
+          case "r":
+            matrix[i, j] = Cell.CONNECTED_ROUTER
+          case "o":
+            matrix[i, j] = Cell.CABLE
 
     return mapClass.Map(
       rows=int(rows),
@@ -34,7 +39,7 @@ def parse(file):
       rRange=int(range_),
       matrix=matrix
     )
-  
+
 def convertDictToSet(d):
   result = set()
   

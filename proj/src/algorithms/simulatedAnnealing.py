@@ -48,7 +48,7 @@ def simulated_annealing(m: Map, initial_temp=1000, cooling_rate=0.995, stopping_
 
     solutions.append(current_map)
     
-    temp *= cooling_rate
+    temp *= cooling_rate * 0.8
     iteration += 1
     no_improvement_count += 1
     
