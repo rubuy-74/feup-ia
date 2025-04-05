@@ -4,6 +4,7 @@ import copy
 
 def hillclimb(m: Map, remaining_budget: int, it: int):
   temp = copy.deepcopy(m)
+  solutions = []
   
   for _ in range(it):
     new_map, new_budget, _ = mutation_func(m, remaining_budget)
@@ -13,7 +14,8 @@ def hillclimb(m: Map, remaining_budget: int, it: int):
     
     if(new_map_value > old_map_value):
       temp = new_map
+      solutions.append(new_map)
       remaining_budget = new_budget
       
 
-  return temp, remaining_budget
+  return temp, remaining_budget,solutions

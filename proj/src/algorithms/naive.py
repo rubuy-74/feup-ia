@@ -7,7 +7,19 @@ from random import shuffle
 from collections import deque
 from utils import computeAdjacents
 
-def naive(m: Map):
+def naive(m: Map, loaded=False):
+  if(loaded):
+    routers = np.where(m.matrix == Cell.ROUTER)
+    x_coords, y_coords = routers
+    coords = list(zip(x_coords,y_coords))
+
+    print(coords)
+    for router in coords:
+      router_targets = m.computeRouterTargets(router)
+      m.coverage.update(router_targets)
+
+    return m, m.budget
+
   to_check = np.where(m.matrix == Cell.TARGET, 1, 0).astype(np.bool_)
   budget = m.budget
   

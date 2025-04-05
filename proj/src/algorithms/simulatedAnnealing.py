@@ -9,6 +9,7 @@ def simulated_annealing(m: Map, initial_temp=1000, cooling_rate=0.995, stopping_
   solutions = []
 
   current_map, remaining_budget = naive(m)
+  print("finished naive")
   best_map = copy.deepcopy(current_map)
   best_map_value = current_map.evaluate(remaining_budget)
 
