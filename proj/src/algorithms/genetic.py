@@ -9,7 +9,7 @@ from tqdm import tqdm
 import copy
 from utils import computeAdjacents
 
-def genetic(m: Map, population_size = 10, generations = 15, mutation_rate = 0.01, crossover_square = 15):
+def genetic(m: Map, population_size = 10, generations = 30, mutation_rate = 0.01, crossover_square = 15):
   population = create_population(m, population_size)
   
   pbar = tqdm(range(generations), desc="Generating...")
@@ -137,5 +137,7 @@ def crossover(father: tuple, mother: tuple, crossover_square: int):
       continue
       
     child = (updated_map, child[1] - cost)
+    
+  print(child[1])
       
   return child
