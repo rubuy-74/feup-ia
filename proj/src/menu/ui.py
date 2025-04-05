@@ -1,6 +1,6 @@
 import pygame
 
-def display(screen, state, title, font, texts, choice_map, algorithms, choice_alg):
+def display(screen, state, title, font, texts, choice_map, algorithms, choice_alg, seed_input):
     if state == 'MENU':
         # Fill the screen with black
         screen.fill((0, 0, 0))
@@ -37,6 +37,18 @@ def display(screen, state, title, font, texts, choice_map, algorithms, choice_al
       screen.fill((0, 0, 0))
       text = font.render('Not implemented yet', True, (255, 0, 0))
       screen.blit(text, (10, 50))
+
+    elif state == 'SEED':
+        # Fill the screen with black
+        screen.fill((0, 0, 0))
+
+        # Draw the seed input box
+        seed_text = font.render('Enter seed:', True, (255, 255, 255))
+        screen.blit(seed_text, (10, 150))
+
+        # Draw the seed input
+        seed_input = font.render(seed_input, True, (255, 255, 255))
+        screen.blit(seed_input, (10, 200))
 
     
     pygame.display.flip()
