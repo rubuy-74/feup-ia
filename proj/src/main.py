@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 from algorithms.genetic import genetic, crossover
 import utils
-import algorithms.greedySolution as greedySolution
 import menu.draw as draw
 import menu.ui as ui
 from algorithms.naive import naive
