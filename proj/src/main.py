@@ -107,23 +107,25 @@ class RouterPlacementGame:
 
     def execute_algorithm(self):
         m = utils.parse("../maps/" + self.config['map'])
-        if(self.config['map'] == 'lets_go_higher.in'):
-            m = utils.parse("../output/" + self.config['map'])
         self.screen.fill((0, 0, 0))
         values = [] 
-        draw.draw_map(self.screen, m, self.config['size'])
+
+        if(self.config['map'] == 'lets_go_higher.in'):
+            m = utils.parse("../output/" + self.config['map'])
+
+        else:
+            draw.draw_map(self.screen, m, self.config['size'])
         if self.config['algorithm'] == 'naive':
             #  m, best_map_value, solutions = simulated_annealing(m)
             solutions = []
             m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
         elif self.config['algorithm'] == 'hillclimbing':
-            m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
-            print('finished naive')
-            remaining_budget = m.budget
+            m, remaining_budget = naive(m, self.config['map'] == 'lets_go_higher.in')
             m, remaining_budget, solutions = hillclimb(m,remaining_budget,100)
-            values = list(map(lambda x: x.evaluate(remaining_budget),solutions))
+            values = solutions
         elif self.config['algorithm'] == 'simulated_annealing':
-            m, remaining_budget, solutions = simulated_annealing(m,max_iterations=100)
+            current_map, remaining_budget = naive(m,self.config['map'] == 'lets_go_higher.in')
+            m, remaining_budget, solutions = simulated_annealing(current_map,remaining_budget=remaining_budget,max_iterations=100)
             values = list(map(lambda x: x.evaluate(0),solutions))
         elif self.config['algorithm'] == 'genetic_solution':
             # m, _, solutions = genetic_solution(m)

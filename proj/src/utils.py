@@ -25,7 +25,7 @@ def parse(file):
           case "#":
             matrix[i, j] = Cell.WALL
           case "r":
-            matrix[i, j] = Cell.ROUTER
+            matrix[i, j] = Cell.CONNECTED_ROUTER
           case "o":
             matrix[i, j] = Cell.CABLE
 

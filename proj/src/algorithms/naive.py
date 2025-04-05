@@ -9,16 +9,19 @@ from utils import computeAdjacents
 
 def naive(m: Map, loaded=False):
   if(loaded):
-    routers = np.where(m.matrix == Cell.ROUTER)
+    routers = np.where(m.matrix == Cell.CONNECTED_ROUTER)
     x_coords, y_coords = routers
     coords = list(zip(x_coords,y_coords))
-
-    print(coords)
     for router in coords:
       router_targets = m.computeRouterTargets(router)
       m.coverage.update(router_targets)
+    
+    num_backbones = len(np.where(m.matrix == Cell.CABLE)[0])
+    num_routers = len(x_coords)
 
-    return m, m.budget
+    remaining_budget = m.budget - (num_routers * m.rtPrice + num_backbones * m.bbPrice)
+
+    return m, remaining_budget
 
   to_check = np.where(m.matrix == Cell.TARGET, 1, 0).astype(np.bool_)
   budget = m.budget
