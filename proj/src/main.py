@@ -131,7 +131,7 @@ class RouterPlacementGame:
             current_map, remaining_budget = naive(m,self.config['map'] == 'lets_go_higher.in')
             m, remaining_budget, solutions = simulated_annealing(current_map,remaining_budget=remaining_budget,max_iterations=100)
             values = list(map(lambda x: x.evaluate(0),solutions))
-        elif self.config['algorithm'] == 'genetic_solution':
+        elif self.config['algorithm'] == 'genetic_algorithm':
             # m, _, solutions = genetic_solution(m)
             m, remaining_budget = genetic(m)
             values = list(map(lambda x: x.evaluate(0),m))
@@ -143,7 +143,7 @@ class RouterPlacementGame:
             draw.draw_solution(self.screen, m, self.config['size'])
             if(len(solutions) > 0):
                 plt.plot(range(len(values)),values,marker='o')
-                plt.xlabel('Index')
+                plt.xlabel('Value')
                 plt.ylabel('Index')
 
                 plt.grid(True)

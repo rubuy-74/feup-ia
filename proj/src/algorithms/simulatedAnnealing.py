@@ -5,10 +5,9 @@ import math
 import random
 import copy
 
-def simulated_annealing(m: Map, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, max_iterations=500):
+def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, max_iterations=500):
   solutions = []
 
-  current_map, remaining_budget = naive(m)
   best_map = copy.deepcopy(current_map)
   best_map_value = current_map.evaluate(remaining_budget)
 
