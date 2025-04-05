@@ -6,6 +6,7 @@ import yaml
 import numpy as np
 from tqdm import tqdm
 
+from algorithms.genetic import genetic, crossover
 import utils
 import algorithms.greedySolution as greedySolution
 import menu.draw as draw
@@ -13,6 +14,9 @@ import menu.ui as ui
 import algorithms.naive as naive
 import algorithms.hillclimb as hillclimb
 from algorithms.simulatedAnnealing import simulated_annealing
+from models.cell import Cell
+import copy
+from algorithms.functions import mutation_func
 
 # Game States
 STATE_MENU = 'MENU'
@@ -112,8 +116,14 @@ class RouterPlacementGame:
             with open(f"../output/{self.config['map']}","w+") as file:
                 file.write(m.matrix.tolist().__str__())
             
-            m, _, _ = simulated_annealing(m)
+            m, remaining_budget = genetic(m)
             
+            routers = np.sum(m.matrix == Cell.CONNECTED_ROUTER)
+            cables = np.sum(m.matrix == Cell.CABLE)
+            
+            print(routers * m.rtPrice + cables * m.bbPrice + remaining_budget)
+            
+            print("FINAL SCORE:", m.evaluate(remaining_budget))
             
         elif self.config['algorithm'] == 'greedy':
             sol = greedySolution.greedySolution(m)

@@ -43,7 +43,6 @@ def draw_solution(screen, m: Map, size):
             
             if cell_type in colors:
                 draw_pixel(screen, x, y, colors[cell_type], size)
-                
 
     for coords in m.coverage:
         x, y = coords

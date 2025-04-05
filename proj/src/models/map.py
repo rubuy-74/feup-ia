@@ -25,6 +25,11 @@ class Map:
       self.original = copy.deepcopy(matrix)
       self.coverage = set()
       
+  def __str__(self):
+    return (f"Map(rows={self.rows}, columns={self.columns}, backbone={self.backbone}, "
+      f"budget={self.budget}, rtPrice={self.rtPrice}, bbPrice={self.bbPrice}, "
+      f"rRange={self.rRange}, coverage={len(self.coverage)})")
+      
   def isWall(self, coords: tuple):
     return self.original[coords] == Cell.WALL
   
@@ -41,7 +46,7 @@ class Map:
     return self.original[coords] == Cell.VOID
   
   def get_path_cost(self, path: list):
-    return len(path) * self.bbPrice + self.rtPrice
+    return len(path) * self.bbPrice + self.rtPrice - self.bbPrice
     
   def evaluate(self, remaining_budget: int):
     return 1000 * len(self.coverage) + remaining_budget

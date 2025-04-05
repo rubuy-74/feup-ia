@@ -15,5 +15,4 @@ def hillclimb(m: Map, remaining_budget: int, it: int):
       temp = new_map
       remaining_budget = new_budget
       
-
   return temp, remaining_budget

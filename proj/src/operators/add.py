@@ -8,7 +8,7 @@ from collections import deque
 
 def add(m: Map, current_budget: int):
    if current_budget + m.rtPrice > m.budget:
-      print("cant add due to budget")
+      
       return m, current_budget, "add"
    
    for _ in range(50):
@@ -23,10 +23,10 @@ def add(m: Map, current_budget: int):
       
          if not passed_budget:
             m.matrix[x, y] = type_of_cell_before
-            print("cant add due to budget")
+            temp.matrix[x, y] = type_of_cell_before
             continue
          
-         router_targets = m.computeRouterTargets((x,y))
+         router_targets = temp.computeRouterTargets((x,y))
          temp.coverage.update(router_targets)
          
          return temp, current_budget - cost, "add"
@@ -57,6 +57,11 @@ def remove(m: Map, current_budget: int):
       
       for cell in path_until_interception[:-1]:
          if m.original[cell] != Cell.WALL:
+            if m.matrix[cell] == Cell.CONNECTED_ROUTER:
+               current_budget += m.rtPrice
+            elif m.matrix[cell] == Cell.CABLE:
+               current_budget += m.bbPrice
+            
             m.matrix[cell] = Cell.TARGET
          else:
             m.matrix[cell] = Cell.WALL
@@ -71,35 +76,29 @@ def remove(m: Map, current_budget: int):
    return m, current_budget, "remove"
 
 def bfs_until_interception(m: Map, begin: tuple):
-  visited = np.zeros((m.rows, m.columns), dtype=np.bool_)
-  parent = [[-1] * m.columns for _ in range(m.rows)]
-  
+  visited = set()
   queue = deque()
-  queue.append(begin)
-  visited[begin[0]][begin[1]] = True
+  queue.append((begin, [begin]))
   
   while queue:
-   current_cell = queue.popleft()
+   current_cell, path = queue.popleft()
     
-   adjs = computeAdjacents(current_cell)
-   connected_adjs = list(filter(lambda x: m.isCable(x) or m.isBackBone(x) or m.isRouter(x), adjs))
+   if current_cell in visited:
+      continue
+   
+   visited.add(current_cell)
+   
+   if current_cell != begin:
+      adjs = computeAdjacents(current_cell)
+      connected_adjs = list(filter(lambda x: m.isCable(x) or m.isBackBone(x) or m.isRouter(x), adjs))
     
-   if len(connected_adjs) >= 3:
-      path = []
-      curr_backtrack = current_cell
-      while curr_backtrack != begin:
-        path.append(curr_backtrack)
-        curr_backtrack = parent[curr_backtrack[0]][curr_backtrack[1]]
-      path.append(curr_backtrack)
-      
-      return path[1:]
+      if len(connected_adjs) >= 3:
+         return path
     
    for adj in computeAdjacents(current_cell):
       x, y = adj
-      if 0 <= x < m.rows and 0 <= y < m.columns:
-        if not visited[x][y]:
-         queue.append(adj)
-         visited[x][y] = True
-         parent[x][y] = current_cell
+      if (0 <= x < m.rows and 0 <= y < m.columns and adj not in visited and (m.isCable(adj) or m.isBackBone(adj) or m.isRouter(adj))):
+         new_path = path + [adj]
+         queue.append((adj, new_path))
   
   return None

@@ -6,6 +6,7 @@ from tqdm import tqdm
 from random import shuffle
 from collections import deque
 from utils import computeAdjacents
+import copy
 
 def naive(m: Map):
   to_check = np.where(m.matrix == Cell.TARGET, 1, 0).astype(np.bool_)
@@ -28,11 +29,14 @@ def naive(m: Map):
     if m.matrix[x][y] == Cell.CABLE:
       continue
     
+    old_cell = m.matrix[x, y]
+    
     m.matrix[x, y] = Cell.ROUTER
     
     temp, passed_budget, cost = connect_to_backbone(m, (x, y), budget)
     
     if not passed_budget:
+      m.matrix[x, y] = old_cell
       break
     
     m = temp
@@ -53,11 +57,11 @@ def naive(m: Map):
   return m, budget
       
     
-def connect_to_backbone(m: Map, router: Cell, budget: int):
+def connect_to_backbone(m: Map, router: tuple, budget: int):
   path = bfs(m, router)
   cost = m.get_path_cost(path)
   
-  temp = m
+  temp = copy.deepcopy(m)
   
   if cost <= budget:
     for cell in path:
