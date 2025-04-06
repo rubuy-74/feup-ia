@@ -4,9 +4,11 @@ from models.map import Map
 import math
 import random
 import copy
+import time
 
-def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, stop_condition=None):
+def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10000, cooling_rate=0.995, stopping_temp=1e-8, stop_condition=None):
   solutions = []
+  it = 0
 
   best_map = copy.deepcopy(current_map)
   best_map_value = current_map.evaluate(remaining_budget)
@@ -17,7 +19,9 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
   no_improvement_count = 0
   max_no_improvement = 2000
 
+  start = time.time()
   while temp > stopping_temp:
+    it += 1
     if stop_condition and stop_condition():
       print("Stopping due to external condition")
       break
@@ -59,4 +63,4 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
     
     
   print("DIFFERENCE:", best_map_value - temporary)
-  return best_map, best_map_value, solutions
+  return best_map, best_map_value, solutions, it, (time.time() - start)

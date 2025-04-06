@@ -8,15 +8,19 @@ import numpy as np
 from tqdm import tqdm
 import copy
 from utils import computeAdjacents
+import time
 
 def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
   population = create_population(m, population_size)
   solutions = []
-  
+  it = 0
+
+  start = time.time() 
   while True:
     if stop_condition and stop_condition():
       print("Stopping due to external condition")
       break
+    it += 1
     fitnesses = [pop.evaluate(rem_budget) for (pop, rem_budget) in population]
     
     best_fitness = max(fitnesses)
@@ -58,7 +62,7 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
   
   best_individual[0].coverage = new_coverage
   
-  return best_individual,solutions
+  return best_individual,solutions, it, time.time() - start
   
   
 def create_population(m: Map, size: int):

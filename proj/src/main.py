@@ -44,8 +44,8 @@ class RouterPlacementGame:
         self.font = pygame.font.SysFont(None, 55)
 
         # Define options
-        self.texts = ['Simple Example', 'Charleston Road', 'Lets Go Higher', 'Opera', 'Rue De Londres']
-        self.file_options = ['example.in', 'charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
+        self.texts = ['Charleston Road', 'Lets Go Higher', 'Opera', 'Rue De Londres']
+        self.file_options = ['charleston_road.in', 'lets_go_higher.in', 'opera.in', 'rue_de_londres.in']
         self.algorithms = ['Naive', 'Hill Climbing', 'Simulated Annealing' , 'Genetic Algorithm']
         self.algorithms_config = ['naive', 'hillclimbing', 'simulated_annealing', 'genetic_algorithm']
 
@@ -112,6 +112,7 @@ class RouterPlacementGame:
         m = utils.parse("../maps/" + self.config['map'])
         self.screen.fill((0, 0, 0))
         values = [] 
+        remaining_budget = 0
 
         if(self.config['map'] == 'lets_go_higher.in'):
             m = utils.parse("../output/" + self.config['map'])
@@ -130,32 +131,35 @@ class RouterPlacementGame:
         
         if self.config['algorithm'] == 'naive':
             solutions = []
-            m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
+            start = time.time()
+            m, remaining_budget = naive(m)
+            it = 1
+            time_spent = time.time() - start
         elif self.config['algorithm'] == 'hillclimbing':
             m, remaining_budget = naive(m, self.config['map'] == 'lets_go_higher.in')
-            m, remaining_budget, solutions = hillclimb(m, remaining_budget, stop_condition=should_stop)
+            m, remaining_budget, solutions,it,time_spent= hillclimb(m, remaining_budget, stop_condition=should_stop)
             values = solutions
         elif self.config['algorithm'] == 'simulated_annealing':
             current_map, remaining_budget = naive(m,self.config['map'] == 'lets_go_higher.in')
-            m, remaining_budget, solutions = simulated_annealing(current_map,remaining_budget=remaining_budget, stop_condition=should_stop)
+            m, _, solutions,it,time_spent = simulated_annealing(current_map,remaining_budget=remaining_budget, stop_condition=should_stop)
             values = list(map(lambda x: x.evaluate(0),solutions))
         elif self.config['algorithm'] == 'genetic_algorithm':
             # m, _, solutions = genetic_solution(m)
-            (m,remaining_budget), solutions = genetic(m)
-            values = solutions
+            (m, remaining_budget),values,it,time_spent = genetic(m, stop_condition=should_stop)
         else:
             self.state = STATE_NOT_IMPLEMENTED
             return
 
         if m:
             draw.draw_solution(self.screen, m, self.config['size'])
+            utils.dump_solution(f"{self.config['map'][:-3]}_{self.config['algorithm']}.out",m,remaining_budget,it,time_spent)
             if(len(solutions) > 0):
                 plt.plot(range(len(values)),values,marker='o')
                 plt.xlabel('Value')
                 plt.ylabel('Index')
 
                 plt.grid(True)
-                plt.savefig(f"../output/{self.config['map'][:-3]}_{self.config['algorithm']}.png")
+                plt.savefig(f"../output/graphs/{self.config['map'][:-3]}_{self.config['algorithm']}.png")
             
         self.state = STATE_FROZEN
 

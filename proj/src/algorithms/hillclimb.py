@@ -2,13 +2,16 @@ from models.map import Map
 from algorithms.functions import mutation_func
 import copy
 from tqdm import tqdm
+import time
 
 def hillclimb(m: Map, remaining_budget: int, stop_condition=None):
   temp = copy.deepcopy(m)
   solutions = []
+  it = 0
   
   #pbar = tqdm(range(it), desc="Running Hill Climb")
   
+  start = time.time()
   while True:
     if stop_condition and stop_condition():
       print("Stopping due to external condition")
@@ -27,9 +30,10 @@ def hillclimb(m: Map, remaining_budget: int, stop_condition=None):
       
     m = new_map
     remaining_budget = new_budget
+    it += 1
     
     #pbar.update()
     
   #pbar.close()      
 
-  return temp, remaining_budget,solutions
+  return temp, remaining_budget,solutions, it, (time.time()-start)
