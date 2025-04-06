@@ -1,19 +1,32 @@
-from models.solution import Solution
 from models.map import Map
 from algorithms.functions import mutation_func
+import copy
+import time
 
-#TODO: Change number of iterations to time
-def hillclimb(solution: Solution, m: Map, it: int):
-  for _ in range(it):
-    new_solution = mutation_func(m,solution)
-    new_solution_value = m.evaluate(new_solution)
-    solution_value = m.evaluate(solution)
+def hillclimb(m: Map, remaining_budget: int, probabilities: object, stop_condition=None):
+  temp = copy.deepcopy(m)
+  solutions = []
+  it = 0
+  
+  start = time.time()
+  while True:
+    if stop_condition and stop_condition():
+      print("Stopping due to external condition")
+      break
+    new_map, new_budget, _ = mutation_func(m, remaining_budget, probabilities['add'], probabilities['remove'], probabilities['nothing'])
+    
+    new_map_value = new_map.evaluate(new_budget)
+    old_map_value = temp.evaluate(remaining_budget) 
+    
+    print(old_map_value, new_map_value)
+    
+    if(new_map_value > old_map_value):
+      print("ACCEPTING BEST")
+      solutions.append(new_map_value)
+      temp = copy.deepcopy(new_map)
+      
+    m = new_map
+    remaining_budget = new_budget
+    it += 1
 
-    print(solution_value, new_solution_value)
-
-    if(new_solution_value >= solution_value):
-      for router in (new_solution.routers.difference(solution.routers)):
-        router.coverage = m.computeRouterTargets(router.cell)
-      solution = new_solution
-
-  return solution
+  return temp, remaining_budget,solutions, it, (time.time()-start)

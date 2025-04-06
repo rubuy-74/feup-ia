@@ -1,92 +1,104 @@
-from models.solution import Solution
 from models.map import Map
-from models.router import Router
-from algorithms.bfs import bfs_to_backbone_cell
-import random
 from models.cell import Cell
+from algorithms.naive import connect_to_backbone
+from utils import computeAdjacents
+import random
+import numpy as np
+from collections import deque
 
-
-def add(s: Solution, m: Map):
-    if m.get_cost(s) + m.rtPrice > m.budget:
-       print("cant add due to budget")
-       return s
-
-    new_cell, path = find_best_router_cell(s, m)
-
-    if not new_cell:
-       return s
-    
-    if m.get_cost(s) + (m.bbPrice * len(path)) > m.budget:
-       return s
-    
-    new_router = Router(new_cell, m.rRange, m.rtPrice, [])
-
-    new_routers = s.routers.copy()
-    new_routers.add(new_router)
-
-    new_bb_connections = m.backbone.connections.copy()
-    new_bb_connections[new_cell] = path
-
-    return Solution(new_bb_connections, new_routers)
-
-def find_best_router_cell(s: Solution, m: Map):
-    covered_cells = s.computeCoverage()
-    non_covered_cells = m.targets.difference(covered_cells)
-
-    checked_cells = set()
-    if non_covered_cells:
-      c = random.choice(list(non_covered_cells - checked_cells))
-      if router_is_valid(c, m, s):
-        path = bfs_to_backbone_cell(m, c, s.getBackboneCellsInSet())
-        return c, path
+def add(m: Map, current_budget: int):
+   if current_budget + m.rtPrice > m.budget:
       
-      checked_cells.add(c)
+      return m, current_budget, "add"
+   
+   for _ in range(50):
+      x = random.randint(0, m.rows - 1)
+      y = random.randint(0, m.columns - 1)
+      
+      if isValid(m, (x, y)):
+         type_of_cell_before = m.matrix[x, y]
+         m.matrix[x, y] = Cell.ROUTER
          
-      c, path = maximizing_coverage(s, m)
-      if c:
-         return c, path
+         temp, passed_budget, cost = connect_to_backbone(m, (x, y), current_budget)
+      
+         if not passed_budget:
+            m.matrix[x, y] = type_of_cell_before
+            temp.matrix[x, y] = type_of_cell_before
+            continue
+         
+         router_targets = temp.computeRouterTargets((x,y))
+         temp.coverage.update(router_targets)
+         
+         return temp, current_budget - cost, "add"
+   
+   return m, current_budget, "add"
+      
+
+def isValid(m: Map, coords: tuple):
+   return not m.isBackBone(coords) and not m.isRouter(coords) and not m.isWall(coords) and not m.isVoid(coords) and not m.isCable(coords)
+
+def remove(m: Map, current_budget: int):
+   routers = np.argwhere(m.matrix == Cell.CONNECTED_ROUTER)
+   
+   if routers.size == 0:
+      return m, current_budget, "remove"
+   
+   x, y = random.choice(routers)
+   
+   adjs = computeAdjacents((x, y))
+   connected_adjs = list(filter(lambda x: m.isCable(x) or m.isBackBone(x) or m.isRouter(x), adjs))
+   
+   if len(connected_adjs) >= 2:
+      m.matrix[x, y] = Cell.CABLE
+      current_budget += m.rtPrice - m.bbPrice
+   else:
+      current_budget += m.rtPrice
+      path_until_interception = bfs_until_interception(m, (x, y))
+      
+      for cell in path_until_interception[:-1]:
+         if m.original[cell] != Cell.WALL:
+            if m.matrix[cell] == Cell.CONNECTED_ROUTER:
+               current_budget += m.rtPrice
+            elif m.matrix[cell] == Cell.CABLE:
+               current_budget += m.bbPrice
+            
+            m.matrix[cell] = Cell.TARGET
+         else:
+            m.matrix[cell] = Cell.WALL
+      
+   new_coverage = set()
+      
+   for router in routers:
+      new_coverage.update(m.computeRouterTargets(router))
+
+   m.coverage = new_coverage
+
+   return m, current_budget, "remove"
+
+def bfs_until_interception(m: Map, begin: tuple):
+  visited = set()
+  queue = deque()
+  queue.append((begin, [begin]))
+  
+  while queue:
+   current_cell, path = queue.popleft()
     
-    return totally_random(s, m)
-
-def router_is_valid(c: Cell, m: Map, s: Solution):
-   return not m.isWall(c) and not m.isVoid(c) and not m.isBackbone(c) and c not in s.getBackboneCellsInSet()
-
-def maximizing_coverage(s: Solution, m: Map):
-   best_pos, best_path, best_cov = None, [], 0
-
-   for _ in range(50):
-    x = random.randint(0, m.columns - 1)
-    y = random.randint(0, m.rows - 1)
-
-    new_possible_cell = Cell(x, y)
-
-    if router_is_valid(new_possible_cell, m, s):
-       path_to_bb = bfs_to_backbone_cell(m, new_possible_cell, s.getBackboneCellsInSet())
-
-       if path_to_bb:
-          new_coverage = m.computeRouterTargets(new_possible_cell)
-          if len(new_coverage) > best_cov:
-             best_cov = len(new_coverage)
-             best_path = path_to_bb
-             best_pos = new_possible_cell
+   if current_cell in visited:
+      continue
+   
+   visited.add(current_cell)
+   
+   if current_cell != begin:
+      adjs = computeAdjacents(current_cell)
+      connected_adjs = list(filter(lambda x: m.isCable(x) or m.isBackBone(x) or m.isRouter(x), adjs))
     
-    return best_pos, best_path
-
-def totally_random(s: Solution, m: Map):
-
-   for _ in range(50):
-    x = random.randint(0, m.columns - 1)
-    y = random.randint(0, m.rows - 1)
-
-    new_possible_cell = Cell(x, y)
-
-    if router_is_valid(new_possible_cell, m, s):
-       path_to_bb = bfs_to_backbone_cell(m, new_possible_cell, s.getBackboneCellsInSet())
-
-       if path_to_bb:
-          return new_possible_cell, path_to_bb
+      if len(connected_adjs) >= 3:
+         return path
     
-    print("returning none!")
-    return None, []
-
-       
+   for adj in computeAdjacents(current_cell):
+      x, y = adj
+      if (0 <= x < m.rows and 0 <= y < m.columns and adj not in visited and (m.isCable(adj) or m.isBackBone(adj) or m.isRouter(adj))):
+         new_path = path + [adj]
+         queue.append((adj, new_path))
+  
+  return None
