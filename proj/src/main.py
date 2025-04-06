@@ -86,7 +86,7 @@ class RouterPlacementGame:
         solutions = []
         if self.algo == 'naive':
             start = time.time()
-            m, _ = naive(m, self.constraints['budget'], self.map == 'lets_go_higher.in')
+            m, remaining_budget = naive(m, self.constraints['budget'], self.map == 'lets_go_higher.in')
             it = 1
             time_spent = time.time() - start
         elif self.algo == 'hill_climbing':
@@ -100,18 +100,18 @@ class RouterPlacementGame:
             m, remaining_budget, solutions, it, time_spent = simulated_annealing(current_map, remaining_budget, self.probs, stop_condition=should_stop)
             
         elif self.algo == 'genetic':
-            m, remaining_budget, solutions, it, time_spent = genetic(m, self.probs, stop_condition=should_stop)
+            (m, remaining_budget), solutions, it, time_spent = genetic(m, self.probs, self.constraints['budget'],stop_condition=should_stop)
 
         if m:
             draw.draw_solution(self.screen, m, self.size)
-            utils.dump_solution(f"{self.config['map'][:-3]}_{self.config['algorithm']}.out",m,remaining_budget,it,time_spent)
+            utils.dump_solution(f"{self.map[:-3]}_{self.algo}.out", m, remaining_budget, it, time_spent)
             if(len(solutions) > 0):
                 plt.plot(range(len(solutions)),solutions,marker='o')
-                plt.xlabel('Value')
-                plt.ylabel('Index')
+                plt.xlabel('Iterations')
+                plt.ylabel('Score')
 
                 plt.grid(True)
-                plt.savefig(f"../output/{self.map[:-3]}_{self.algo}.png")
+                plt.savefig(f"../output/v2/{self.map[:-3]}_{self.algo}.png")
             
         self.state = STATE_FROZEN
 

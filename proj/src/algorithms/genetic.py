@@ -10,8 +10,8 @@ import copy
 from utils import computeAdjacents
 import time
 
-def genetic(m: Map, probabilities, population_size = 10, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
-  population = create_population(m, population_size)
+def genetic(m: Map, probabilities, budget_constraint, population_size = 5, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
+  population = create_population(m, population_size, budget_constraint)
   solutions = []
   it = 0
 
@@ -64,19 +64,8 @@ def genetic(m: Map, probabilities, population_size = 10, mutation_rate = 0.01, c
   return best_individual, solutions, it, time.time() - start
   
   
-def create_population(m: Map, size: int):
-  (base_solution, remaining_budget) = naive(copy.deepcopy(m),True)
-  population = [(base_solution,remaining_budget)]
-  for i in range(size-1):
-    rb = remaining_budget
-    mutated = copy.deepcopy(base_solution)
-    for j in range(100):
-      (mutated, rb,_) = mutation_func(mutated,rb)
-      print(str(j)+": " + str(mutated.evaluate(rb)))
-    population.append((mutated,rb))
-    print(str(i)+": " + str(list(map(lambda x: x[0].evaluate(x[1]),population))))
-
-  return population
+def create_population(m: Map, size: int, budget_constraint):
+  return [naive(copy.deepcopy(m), budget_constraint) for _ in range(size)]
 
 def selection(population: list, fitnesses: list):
   parents = []
@@ -94,6 +83,7 @@ def selection(population: list, fitnesses: list):
   return parents
 
 def crossover(father: tuple, mother: tuple, crossover_square: int):
+
   x, y = choice(np.argwhere(father[0].matrix == Cell.CONNECTED_ROUTER))
   
   x_start, x_end = x, min(x + crossover_square, father[0].rows - 1)
