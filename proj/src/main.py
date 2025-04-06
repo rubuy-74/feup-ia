@@ -143,7 +143,7 @@ class RouterPlacementGame:
             values = list(map(lambda x: x.evaluate(0),solutions))
         elif self.config['algorithm'] == 'genetic_algorithm':
             # m, _, solutions = genetic_solution(m)
-            m, remaining_budget = genetic(m)
+            m, remaining_budget = genetic(m, stop_condition=should_stop)
             values = list(map(lambda x: x.evaluate(0),m))
         else:
             self.state = STATE_NOT_IMPLEMENTED
