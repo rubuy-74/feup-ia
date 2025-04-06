@@ -7,4 +7,4 @@ probabilities:
   add: 0.6
   nothing: 0.2
 constraints:
-  budget: 0.7
+  budget: 0
