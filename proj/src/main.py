@@ -115,7 +115,6 @@ class RouterPlacementGame:
 
         if(self.config['map'] == 'lets_go_higher.in'):
             m = utils.parse("../output/" + self.config['map'])
-
         else:
             draw.draw_map(self.screen, m, self.config['size'])
             
@@ -130,7 +129,6 @@ class RouterPlacementGame:
             return False   
         
         if self.config['algorithm'] == 'naive':
-            #  m, best_map_value, solutions = simulated_annealing(m)
             solutions = []
             m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
         elif self.config['algorithm'] == 'hillclimbing':
@@ -143,8 +141,8 @@ class RouterPlacementGame:
             values = list(map(lambda x: x.evaluate(0),solutions))
         elif self.config['algorithm'] == 'genetic_algorithm':
             # m, _, solutions = genetic_solution(m)
-            m, remaining_budget = genetic(m)
-            values = list(map(lambda x: x.evaluate(0),m))
+            (m,remaining_budget), solutions = genetic(m)
+            values = solutions
         else:
             self.state = STATE_NOT_IMPLEMENTED
             return

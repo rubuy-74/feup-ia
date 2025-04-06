@@ -30,7 +30,7 @@ def naive(m: Map, loaded=False):
   max_num_routers = int(m.budget / m.rtPrice)
   pbar = tqdm(range(max_num_routers), desc="Placing Routers")
   
-  while budget > 0:
+  while budget > m.budget * 0.7:
     abstraction = medial_axis(to_check)
     coverage = np.argwhere(abstraction > 0).tolist()
     

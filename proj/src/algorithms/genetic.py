@@ -11,7 +11,7 @@ from utils import computeAdjacents
 
 def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
   population = create_population(m, population_size)
-  
+  solutions = []
   
   while True:
     if stop_condition and stop_condition():
@@ -21,6 +21,7 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
     
     best_fitness = max(fitnesses)
     best_individual = population[fitnesses.index(best_fitness)]
+    solutions.append(best_fitness)
 
     parents = selection(population, fitnesses)
     next_generation = []
@@ -41,6 +42,7 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
   
   best_fitness = max(fitnesses)
   best_individual = population[fitnesses.index(best_fitness)]
+  solutions.append(best_fitness)
   
   rts = np.argwhere(best_individual[0].matrix == Cell.CONNECTED_ROUTER)
   
@@ -56,11 +58,22 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
   
   best_individual[0].coverage = new_coverage
   
-  return best_individual
+  return best_individual,solutions
   
   
 def create_population(m: Map, size: int):
-  return [naive(copy.deepcopy(m)) for _ in range(size)]
+  (base_solution, remaining_budget) = naive(copy.deepcopy(m),True)
+  population = [(base_solution,remaining_budget)]
+  for i in range(size-1):
+    rb = remaining_budget
+    mutated = copy.deepcopy(base_solution)
+    for j in range(100):
+      (mutated, rb,_) = mutation_func(mutated,rb)
+      print(str(j)+": " + str(mutated.evaluate(rb)))
+    population.append((mutated,rb))
+    print(str(i)+": " + str(list(map(lambda x: x[0].evaluate(x[1]),population))))
+
+  return population
 
 def selection(population: list, fitnesses: list):
   parents = []
