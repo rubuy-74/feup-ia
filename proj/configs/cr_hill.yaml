@@ -1,10 +1,10 @@
 algorithm: hill_climbing
 map: charleston_road.in
-size: 1
+size: 2
 seed: 11
 probabilities:
   remove: 0.2
   add: 0.6
   nothing: 0.2
 constraints:
-  budget: 0.5
+  budget: 0.7

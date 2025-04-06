@@ -1,6 +1,6 @@
 algorithm: naive
 map: charleston_road.in
-size: 1
+size: 2
 seed: 11
 probabilities:
   remove: 0.2
