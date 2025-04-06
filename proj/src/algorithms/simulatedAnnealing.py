@@ -6,14 +6,14 @@ import random
 import copy
 import time
 
-def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10000, cooling_rate=0.995, stopping_temp=1e-8, stop_condition=None):
+def simulated_annealing(current_map: Map, remaining_budget : int, probabilities: object, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, stop_condition=None):
+  print("Running...")
+  
   solutions = []
   it = 0
 
   best_map = copy.deepcopy(current_map)
   best_map_value = current_map.evaluate(remaining_budget)
-
-  temporary = best_map_value
 
   temp = initial_temp
   no_improvement_count = 0
@@ -23,10 +23,10 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
   while temp > stopping_temp:
     it += 1
     if stop_condition and stop_condition():
-      print("Stopping due to external condition")
+      print("Stopping")
       break
 
-    new_map, new_budget, _ = mutation_func(current_map, remaining_budget)
+    new_map, new_budget, _ = mutation_func(current_map, remaining_budget, probabilities['add'], probabilities['remove'], probabilities['nothing'])
     current_map_value = current_map.evaluate(remaining_budget)
     new_map_value = new_map.evaluate(new_budget)
 
@@ -40,9 +40,7 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
         best_map_value = current_map_value
         no_improvement_count = 0
         
-        print("ACCEPTING BEST SOLUTION:", best_map_value)
-        
-    else: # if worse, accept it with a probability
+    else:
       delta = new_map_value - current_map_value
       probability = math.exp(delta / temp)
 
@@ -51,16 +49,12 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
         current_map_value = new_map_value
         remaining_budget = new_budget
 
-    solutions.append(current_map)
+    solutions.append(current_map_value)
     
-    temp *= cooling_rate * 0.8
+    temp *= cooling_rate
     no_improvement_count += 1
-    
-    print("CURRENT SOLUTION:", current_map_value)
     
     if no_improvement_count >= max_no_improvement:
       break
     
-    
-  print("DIFFERENCE:", best_map_value - temporary)
   return best_map, best_map_value, solutions, it, (time.time() - start)

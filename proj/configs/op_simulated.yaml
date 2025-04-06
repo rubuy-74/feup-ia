@@ -1,0 +1,10 @@
+algorithm: simulated_annealing
+map: opera.in
+size: 1
+seed: 12
+probabilities:
+  remove: 0.2
+  add: 0.6
+  nothing: 0.2
+constraints:
+  budget: 0

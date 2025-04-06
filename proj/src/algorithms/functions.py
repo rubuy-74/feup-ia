@@ -4,9 +4,9 @@ import random
 
 def mutation_func(m: Map,
                   current_budget: int,
-                  add_rate: float = 0.7,
-                  remove_rate: float = 0.1,
-                  nothing_rate: float = 0.2):
+                  add_rate: float,
+                  remove_rate: float,
+                  nothing_rate: float):
   
   action = random.choices(["add","remove","nothing"], weights=[add_rate*100,remove_rate*100,nothing_rate*100])[0]
 

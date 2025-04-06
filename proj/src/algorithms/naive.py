@@ -8,7 +8,7 @@ from collections import deque
 from utils import computeAdjacents
 import copy
 
-def naive(m: Map, loaded=False):
+def naive(m: Map, budget_constraint, loaded=False):
   if(loaded):
     routers = np.where(m.matrix == Cell.CONNECTED_ROUTER)
     x_coords, y_coords = routers
@@ -30,7 +30,7 @@ def naive(m: Map, loaded=False):
   max_num_routers = int(m.budget / m.rtPrice)
   pbar = tqdm(range(max_num_routers), desc="Placing Routers")
   
-  while budget > m.budget * 0.7:
+  while budget > m.budget * budget_constraint:
     abstraction = medial_axis(to_check)
     coverage = np.argwhere(abstraction > 0).tolist()
     

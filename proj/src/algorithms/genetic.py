@@ -10,7 +10,7 @@ import copy
 from utils import computeAdjacents
 import time
 
-def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
+def genetic(m: Map, probabilities, population_size = 10, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
   population = create_population(m, population_size)
   solutions = []
   it = 0
@@ -26,7 +26,6 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
     best_fitness = max(fitnesses)
     best_individual = population[fitnesses.index(best_fitness)]
     solutions.append(best_fitness)
-
     parents = selection(population, fitnesses)
     next_generation = []
     
@@ -36,7 +35,7 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
       
       if father != mother:
         bob = crossover(father, mother, crossover_square)
-        new_map, new_budget, _ = mutation_func(bob[0], bob[1])
+        new_map, new_budget, _ = mutation_func(bob[0], bob[1], probabilities['add'], probabilities['remove'], probabilities['nothing'])
         next_generation.extend([(new_map, new_budget)])
         
         if len(next_generation) > population_size:
@@ -62,7 +61,7 @@ def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square
   
   best_individual[0].coverage = new_coverage
   
-  return best_individual,solutions, it, time.time() - start
+  return best_individual, solutions, it, time.time() - start
   
   
 def create_population(m: Map, size: int):
