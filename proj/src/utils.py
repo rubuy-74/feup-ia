@@ -41,7 +41,7 @@ def parse(file):
     )
 
 def dump_solution(file_name  : str,m : mapClass,remaining_budget: int,it: int, time_spent):
-  output_path = f"../output/out/{file_name}"
+  output_path = f"../output/out/v2/{file_name}"
 
   rows, columns, range_ = m.rows,m.columns,m.rRange
   bb_cost, rt_cost, budget = m.bbPrice,m.rtPrice, m.budget
@@ -74,7 +74,7 @@ def dump_solution(file_name  : str,m : mapClass,remaining_budget: int,it: int, t
     output_file.write(f'{bx} {by}\n')
 
     for line in output:
-      output_file.write(f"{"".join(line)}\n")
+      output_file.write(f'{"".join(line)}\n')
 
 def convertDictToSet(d):
   result = set()
