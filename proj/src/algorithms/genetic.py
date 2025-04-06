@@ -9,12 +9,14 @@ from tqdm import tqdm
 import copy
 from utils import computeAdjacents
 
-def genetic(m: Map, population_size = 10, generations = 30, mutation_rate = 0.01, crossover_square = 15):
+def genetic(m: Map, population_size = 10, mutation_rate = 0.01, crossover_square = 15, stop_condition=None):
   population = create_population(m, population_size)
   
-  pbar = tqdm(range(generations), desc="Generating...")
   
-  for _ in range(generations):
+  while True:
+    if stop_condition and stop_condition():
+      print("Stopping due to external condition")
+      break
     fitnesses = [pop.evaluate(rem_budget) for (pop, rem_budget) in population]
     
     best_fitness = max(fitnesses)
@@ -36,9 +38,7 @@ def genetic(m: Map, population_size = 10, generations = 30, mutation_rate = 0.01
           next_generation = next_generation[:population_size]
         
     population = next_generation
-    pbar.update()
   
-  pbar.close()
   best_fitness = max(fitnesses)
   best_individual = population[fitnesses.index(best_fitness)]
   

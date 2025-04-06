@@ -5,7 +5,7 @@ import math
 import random
 import copy
 
-def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, max_iterations=500):
+def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=1000, cooling_rate=0.995, stopping_temp=1e-8, stop_condition=None):
   solutions = []
 
   best_map = copy.deepcopy(current_map)
@@ -14,11 +14,13 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
   temporary = best_map_value
 
   temp = initial_temp
-  iteration = 0
   no_improvement_count = 0
   max_no_improvement = 2000
 
-  while temp > stopping_temp and iteration < max_iterations:
+  while temp > stopping_temp:
+    if stop_condition and stop_condition():
+      print("Stopping due to external condition")
+      break
 
     new_map, new_budget, _ = mutation_func(current_map, remaining_budget)
     current_map_value = current_map.evaluate(remaining_budget)
@@ -48,7 +50,6 @@ def simulated_annealing(current_map: Map,remaining_budget : int, initial_temp=10
     solutions.append(current_map)
     
     temp *= cooling_rate * 0.8
-    iteration += 1
     no_improvement_count += 1
     
     print("CURRENT SOLUTION:", current_map_value)

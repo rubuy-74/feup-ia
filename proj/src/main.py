@@ -118,17 +118,28 @@ class RouterPlacementGame:
 
         else:
             draw.draw_map(self.screen, m, self.config['size'])
+            
+        stop_condition = False 
+        
+        def should_stop():
+            nonlocal stop_condition
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    stop_condition = True
+                    return True
+            return False   
+        
         if self.config['algorithm'] == 'naive':
             #  m, best_map_value, solutions = simulated_annealing(m)
             solutions = []
             m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
         elif self.config['algorithm'] == 'hillclimbing':
             m, remaining_budget = naive(m, self.config['map'] == 'lets_go_higher.in')
-            m, remaining_budget, solutions = hillclimb(m,remaining_budget,500)
+            m, remaining_budget, solutions = hillclimb(m, remaining_budget, stop_condition=should_stop)
             values = solutions
         elif self.config['algorithm'] == 'simulated_annealing':
             current_map, remaining_budget = naive(m,self.config['map'] == 'lets_go_higher.in')
-            m, remaining_budget, solutions = simulated_annealing(current_map,remaining_budget=remaining_budget,max_iterations=100)
+            m, remaining_budget, solutions = simulated_annealing(current_map,remaining_budget=remaining_budget, stop_condition=should_stop)
             values = list(map(lambda x: x.evaluate(0),solutions))
         elif self.config['algorithm'] == 'genetic_algorithm':
             # m, _, solutions = genetic_solution(m)
