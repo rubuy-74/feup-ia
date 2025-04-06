@@ -124,7 +124,7 @@ class RouterPlacementGame:
             m, _ = naive(m, self.config['map'] == 'lets_go_higher.in')
         elif self.config['algorithm'] == 'hillclimbing':
             m, remaining_budget = naive(m, self.config['map'] == 'lets_go_higher.in')
-            m, remaining_budget, solutions = hillclimb(m,remaining_budget,100)
+            m, remaining_budget, solutions = hillclimb(m,remaining_budget,500)
             values = solutions
         elif self.config['algorithm'] == 'simulated_annealing':
             current_map, remaining_budget = naive(m,self.config['map'] == 'lets_go_higher.in')
@@ -146,7 +146,7 @@ class RouterPlacementGame:
                 plt.ylabel('Index')
 
                 plt.grid(True)
-                plt.savefig(f'../output/{self.config['map'][:-3]}_{self.config['algorithm']}.png')
+                plt.savefig(f"../output/{self.config['map'][:-3]}_{self.config['algorithm']}.png")
             
         self.state = STATE_FROZEN
 
