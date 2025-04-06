@@ -8,10 +8,10 @@ def draw_pixel(screen, x, y, color, size):
 
 def draw_map(screen, m: Map, size):
     colors = {
-        Cell.VOID: (255, 255, 255),
-        Cell.WALL: (128, 128, 128),
-        Cell.TARGET: (255, 255, 0),
-        Cell.BACKBONE: (255, 0, 0),
+        Cell.VOID: (51, 12, 75),
+        Cell.WALL: (51, 53, 108),
+        Cell.TARGET: (31, 96, 113),
+        Cell.BACKBONE: (0, 0, 0),
     }
 
     for y in range(m.rows):
@@ -24,13 +24,13 @@ def draw_map(screen, m: Map, size):
 
 def draw_solution(screen, m: Map, size):
     colors = {
-        Cell.VOID: (255, 255, 255),
-        Cell.WALL: (128, 128, 128),
-        Cell.TARGET: (255, 255, 0),
+        Cell.VOID: (51, 12, 75),
+        Cell.WALL: (51, 53, 108),
+        Cell.TARGET: (31, 96, 113),
         Cell.BACKBONE: (0, 0, 0),
-        Cell.CONNECTED_ROUTER: (0, 0, 255),
-        Cell.CABLE: (157, 0, 255),
-        Cell.WIRED: (0, 255, 0),
+        Cell.CONNECTED_ROUTER: (145, 202, 121),
+        Cell.CABLE: (255, 239, 73),
+        Cell.WIRED: (83, 146, 164),
     }
 
     for y in range(m.rows):
