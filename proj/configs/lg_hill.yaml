@@ -1,0 +1,10 @@
+algorithm: hill_climbing
+map: lets_go_higher.in
+size: 1
+seed: 13
+probabilities:
+  remove: 0.2
+  add: 0.6
+  nothing: 0.2
+constraints:
+  budget: 0.5
