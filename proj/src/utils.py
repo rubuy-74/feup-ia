@@ -66,8 +66,6 @@ def dump_solution(file_name  : str,m : mapClass,remaining_budget: int,it: int, t
     output.append(output_line)
   with open(output_path,'w+') as output_file:
     output_file.write(f'{time_spent} {it}\n')
-    print(m.evaluate(remaining_budget))
-    print(remaining_budget)
     output_file.write(f'{m.evaluate(remaining_budget)}\n')
     output_file.write(f'{rows} {columns} {range_}\n')
     output_file.write(f'{bb_cost} {rt_cost} {budget}\n')
