@@ -1,7 +1,40 @@
 # IART 2025 - ROUTER PLACEMENT
 
 ## How to Run
-### Configuration Files
+
+Due to the implementation of configuration files, running any map with any algorithm is simpler.
+
+In a configuration file, you can: 
+- Set which map and algorithm you want to run.
+- Set the probabilites of each operator of the mutation function.
+- Set a budget constraint to the naive solution.
+- Set the map size inside the GUI
+
+```yaml
+algorithm: <name of the algorithm>
+map: <name of the map>
+size: 1
+seed: <random integer>
+probabilities:
+  remove: <desired percentage (decimal)>
+  add: <desired percentage (decimal)>
+  nothing: <desired percentage (decimal)>
+constraints:
+  budget: <desired percentage (decimal)>
+```
+Any custom configuration file must be placed inside the <code>configs</code> folder.
+
+It is important to state that the sum of the three probabilities (add, remove and nothing) must add to 1.
+
+To start the program, run on the <code>src</code> directory:
+
+<code>python3 main.py \<config name> </code>
+
+After the command above, a new window will open with the choosen map and the algorithm will start running **indefinetly** (excl. simulated annealing).
+
+To stop the execution, open the map window and press <code>Space</code>. The execution will stop and the last computed solution will be drawn and dumped into a file in the <code>output</code> folder, as well as a plot.
+
+
 
 ## The Approach
 ### Heuristics
