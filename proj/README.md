@@ -115,7 +115,7 @@ Routers have a limited range and cannot be placed in wall cells. Backbones in th
 
 ### Solution Representation
 
-+ A matrix representing the map. Each entry has a type, possibly being <code> [BACKBONE, VOID, WALL, TARGET, WIRED, ROUTER, CONNECTED_ROUTER, CABLE]</code>.
++ A matrix representing the map. Each entry has a type, possibly being <code>[BACKBONE, VOID, WALL, TARGET, WIRED, ROUTER, CONNECTED_ROUTER, CABLE]</code>.
 + Score of the solution, computed using the formula above
 + Time spent on the algorithm execution
   + In the execution of the algorithms that need a initial solution, its computation time was not taking into account.
