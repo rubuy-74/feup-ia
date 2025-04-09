@@ -18,10 +18,7 @@ def hillclimb(m: Map, remaining_budget: int, probabilities: object, stop_conditi
     new_map_value = new_map.evaluate(new_budget)
     old_map_value = temp.evaluate(remaining_budget) 
     
-    print(old_map_value, new_map_value)
-    
     if(new_map_value > old_map_value):
-      print("ACCEPTING BEST")
       solutions.append(new_map_value)
       temp = copy.deepcopy(new_map)
       
