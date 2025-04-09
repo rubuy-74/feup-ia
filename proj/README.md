@@ -5,11 +5,37 @@
 
 ## The Approach
 ### Heuristics
+
+Heuristics are employed to guide the search for better solutions. Some heuristics that we used to base off our solution are:
++ Coverage Maximization: Prioritize placing routers in positions which maximize the coverage
++ Minimize Cost: Try to keep routers closer to the backbone to spend less on backbone cells
++ Avoid walls: Ensure that the router placement algorithm do not position routers within walls, to maintain feasibility.
+
 ### Evaluation Function
-### Operators
+
+The evaluation function is used to score potential solutions based on their effectiveness and cost. The function is defined by:
+
+**score = 1000\*t + (B - (N * Pb + M * Pr))**
+
+t  - number of targeted cells \
+B  - budget \
+N  - Number of cells connected to backbone \
+Pb - price of connecting one cell to the backbone \
+M  -  Number of routers connected to backbone \
+Pr - price of connecting a router to the backbone 
+
+This function prioritizes the coverage over the price of the final solution. The contribution of the solution cost penalizes excessive resources.
+
+### Operators:
+
++ Mutation: Randomly adjust the placement to explore new solutions.
+  + Add: Add router in a random position if the budget allows
+  + Remove: Removes a random router and its path to the backbone, while maintaining the connection for affected and adjacent routers.
++ Crossover: Combined two solutions to generate a new one.
+  + Choose random rectangles in one of the parents. Copy all the squares on the grid from the other solution to the original. The square is of fixed sized.
+  + This approach allows the merger of the solutions with a limited amount of calculations for new paths, which can simplifies the calculations. 
 
 ## Implemented Algorithms 
-
 ### BFS - Breadth First Search
 ### Greedy Solution (Naive Solution)
 ### HillClimb
