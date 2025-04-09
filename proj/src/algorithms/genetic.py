@@ -143,7 +143,5 @@ def crossover(father: tuple, mother: tuple, crossover_square: int):
       continue
       
     child = (updated_map, child[1] - cost)
-    
-  print(child[1])
       
   return child
