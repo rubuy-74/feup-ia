@@ -2,6 +2,12 @@
 
 This repository contains the implementation of various artificial intelligence algorithms and tools developed as part of the FEUP Artificial Intelligence (IA) course.
 
+## Contributors
+
+Rubem Neto      - up202207086 \
+Diogo Goiana    - up2022XXXXX \
+Leandro Martins - up2022XXXXX 
+
 ## Project Overview
 
 The main project is located in the `proj` folder. It includes the implementation of algorithms for solving the router placement problem, visualization tools using Pygame, and utilities for parsing and handling input/output files.
