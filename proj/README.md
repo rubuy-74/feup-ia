@@ -72,63 +72,191 @@ This function prioritizes the coverage over the price of the final solution. The
 
 ## Implemented Algorithms 
 
-### Naive Solution
+### BFS - Breadth-First Search
 
-The Naive solution starts by placing a router in a random position that is not yet covered by any other router.
+The *Breadth-First Search (BFS)* algorithm is used to find the shortest path from a router to the backbone in the grid. It ensures that routers are connected to the backbone while respecting the constraints of the problem.
 
-It then connects that router to a backbone connection (which can either be a connected router, a connected cable, or the backbone itself). This connection is calculated using a breadth-first search (BFS), which leverages the main <code>ndarray</code> structure.
+#### Algorithm Flow:
+1. *Initialization*:
+   - Start from the given router's position (begin).
+   - Initialize a queue to store cells to be visited and a visited matrix to track explored cells.
+   - Use a parent matrix to keep track of the path from the router to the backbone.
 
-After connecting the router, its path is accounted for in the solution budget, and the map's coverage is updated.
+2. *Exploration*:
+   - While there are cells in the queue:
+     - Dequeue the current cell and check if it is connected to the backbone, a cable, or another router.
+     - If a connection is found, backtrack using the parent matrix to construct the path.
 
-At any time, if a router placement or a path creation surpasses the budget, the entire computation is reset, and another iteration starts.
+3. *Path Construction*:
+   - If a valid path is found, return the path from the router to the backbone, excluding the router itself.
+   - If no path is found, return None.
 
-The algorithm continues running while there is still a budget available.
+4. *Output*:
+   - Return the shortest path from the router to the backbone or None if no valid path exists.
+
+#### Key Features:
+- *Shortest Path*: Ensures that the path from the router to the backbone is the shortest possible.
+- *Constraint Handling*: Only explores valid cells (e.g., not walls or void cells).
+- *Backtracking*: Uses the parent matrix to reconstruct the path once a connection is found.
+
+---
+
+### Greedy Solution (Naive Solution)
+
+The *Naive Solution* is a greedy algorithm that places routers iteratively to maximize coverage while respecting the budget constraints. It uses a medial axis transformation to prioritize router placement in areas that maximize coverage with minimal cost.
+
+#### Algorithm Flow:
+1. *Initialization*:
+   - Start with an empty grid and the full budget.
+   - Identify all target cells that require coverage.
+   - Compute the maximum number of routers that can be placed based on the budget and the price of a router.
+
+2. *Medial Axis Transformation*:
+   - Use the medial axis transformation to identify the most central points in the grid that maximize coverage.
+   - Generate a list of potential router placement positions based on the transformation.
+
+3. *Router Placement*:
+   - Shuffle the list of potential positions to introduce randomness.
+   - For each position:
+     - Place a router at the position.
+     - Attempt to connect the router to the backbone using a breadth-first search (BFS) algorithm.
+     - If the connection is successful and within budget:
+       - Update the grid to reflect the router and its connection.
+       - Deduct the cost of the router and its connection from the remaining budget.
+       - Update the coverage set with the cells covered by the router.
+     - If the connection is not successful or exceeds the budget, revert the placement.
+
+4. *Stopping Condition*:
+   - Stop when the budget falls below a predefined threshold or all target cells are covered.
+
+5. *Output*:
+   - Return the final grid configuration, the remaining budget, and the total coverage achieved.
+
+#### Key Features:
+- *Greedy Placement*: Places routers in positions that maximize coverage based on the medial axis transformation.
+- *Budget-Constrained*: Ensures that the total cost of routers and connections does not exceed the budget.
+- *Breadth-First Search (BFS)*: Finds the shortest path to connect a router to the backbone.
+- *Coverage Update*: Dynamically updates the set of covered cells after each router placement.
+
+---
 
 ### HillClimb
 
-The HillClimb algorithm starts with an initial solution computed using the naive algorithm.
+The *HillClimb* algorithm is a local search heuristic that iteratively improves a solution by applying random mutations and greedily accepting only better solutions. It is designed to explore the solution space efficiently while maintaining simplicity.
 
-At each iteration, a mutation is performed on the current solution. The mutation can be one of the following:
+#### Algorithm Flow:
+1. *Initialization*:
+   - Start with an initial map (m) and a given budget.
+   - Create a deep copy of the map (temp) to track the best solution found so far.
+   - Initialize an empty list to store accepted solutions for post-analysis.
 
-+ **Add:** A random router is added, and a BFS is performed to find the shortest path to a connected cell.
-+ **Remove:** A random router is removed from the matrix. If the selected router is part of a straight cable, it is replaced by a cable. If it is isolated, its path to a straight cable is removed (using BFS).
-+ **Nothing:** The mutation function does nothing to the current solution.
-Each operator respects the current remaining budget.
+2. *Mutation*:
+   - Apply a random mutation to the map using weighted probabilities:
+     - *Add* a router.
+     - *Remove* a router.
+     - *Do nothing*.
+   - The mutation is performed using the mutation_func, which ensures that the changes respect the problem's constraints.
 
-After applying a mutation, the new solution is evaluated against the old one. If the new solution is better, it replaces the old one, and the budget is updated accordingly.
+3. *Evaluation*:
+   - Evaluate the mutated map (new_map) and compare its score with the current best map (temp).
+   - If the mutated map has a better score, accept it as the new best solution and update temp.
 
-The algorithm continues iterating until the <code>Space</code> key is pressed by the user.
+4. *Exploration*:
+   - Continue the search from the mutated map, even if it is worse than the current best. This allows the algorithm to explore the solution space more broadly.
+
+5. *Stopping Condition*:
+   - The algorithm runs indefinitely until an external stop condition is met (e.g., pressing the space key).
+
+6. *Output*:
+   - Return the best solution found (temp), the remaining budget, the list of accepted solutions, the number of iterations, and the total runtime.
+
+#### Key Features:
+- *Greedy Acceptance*: Only accepts solutions that improve the current best score.
+- *Randomness*: Introduces randomness through mutations to explore the solution space.
+- *Post-Analysis*: Records all accepted solutions for further analysis and debugging.
+- *Flexible Stopping*: Allows external conditions to terminate the search, making it adaptable to different use cases.
+
+---
 
 ### Simulated Annealing
 
-The Simulated Annealing algorithm starts with an initial solution computed using the naive algorithm. It explores the solution space by applying mutations and uses a probabilistic acceptance criterion to escape local optima.
+The *Simulated Annealing* algorithm is a probabilistic optimization technique inspired by the annealing process in metallurgy. It explores the solution space by applying random mutations and accepts solutions based on a probability that decreases over time, allowing it to escape local optima and converge to a near-optimal solution.
 
-At each iteration:
+#### Algorithm Flow:
+1. *Initialization*:
+   - Start with an initial map (current_map) and a given budget.
+   - Set the initial temperature (temp) and define the cooling rate (cooling_rate).
+   - Initialize the best solution (best_map) as a copy of the initial map and evaluate its score.
 
-A mutation is applied to the current solution, which can add, remove, or do nothing to the placement of routers.
+2. *Mutation*:
+   - Apply a random mutation to the map using weighted probabilities:
+     - *Add* a router.
+     - *Remove* a router.
+     - *Do nothing*.
+   - The mutation is performed using the mutation_func, ensuring that the changes respect the problem's constraints.
 
-The new solution is evaluated. If it is better than the current solution, it is accepted.
-If the new solution is worse, it may still be accepted with a probability proportional to the difference in scores (Δ) and the current temperature (T), calculated as <code>P = exp(Δ / T)</code>. This allows the algorithm to escape local optima.
+3. *Evaluation*:
+   - Evaluate the mutated map (new_map) and compare its score with the current map (current_map).
+   - If the mutated map has a better score, accept it as the new current map.
+   - If the mutated map is worse, accept it with a probability proportional to the temperature (exp(delta / temp)), where delta is the difference in scores.
 
-The temperature decreases over time according to a cooling schedule <code>(T = T * cooling_rate)</code>, and the algorithm stops when the temperature reaches a predefined threshold or until the <code>Space</code> key is pressed by the user.
+4. *Update Best Solution*:
+   - If the current map is better than the best solution found so far, update the best solution (best_map).
 
-The algorithm tracks the best solution found during the process and returns it as the final result.
+5. *Cooling*:
+   - Decrease the temperature after each iteration using the cooling rate (temp *= cooling_rate).
+
+6. *Stopping Condition*:
+   - Stop when the temperature falls below a predefined threshold (stopping_temp), the maximum number of iterations without improvement is reached, or an external stop condition is triggered (e.g., pressing the space key).
+
+7. *Output*:
+   - Return the best solution found (best_map), its score, the list of solutions over iterations, the number of iterations, and the total runtime.
+
+#### Key Features:
+- *Probabilistic Acceptance*: Can accept worse solutions, enabling escape from local optima.
+- *Cooling Schedule*: Gradually reduces the probability of accepting worse solutions as the algorithm progresses.
+- *Exploration and Exploitation*: Balances exploration of the solution space and exploitation of promising areas.
+- *Flexible Stopping*: Allows external conditions to terminate the search, making it adaptable to different use cases.
+
+---
 
 ### Genetic Algorithm
 
-The Genetic Algorithm is a population-based optimization technique inspired by natural selection. It starts by creating an initial population of solutions using the naive algorithm (pre-computed for bigger maps).
+The *Genetic Algorithm* is an evolutionary optimization technique inspired by natural selection. It evolves a population of solutions over generations by applying selection, crossover, and mutation operators. This approach balances exploration and exploitation to converge toward an optimal or near-optimal solution.
 
-**Evaluation:** Each individual in the population is evaluated using the scoring function.
+#### Algorithm Flow:
+1. *Initialization*:
+   - Generate an initial population of maps (population) using the naive algorithm, ensuring each solution respects the budget constraint.
+   - Evaluate the fitness of each individual in the population using the evaluate method of the Map class.
 
-**Selection:** A subset of the population is selected as parents based on their fitness scores. A tournament selection process is used to choose the best candidates, creating a pool of 3.
+2. *Selection*:
+   - Select parents based on their fitness using a tournament selection strategy.
+   - Ensure diversity by avoiding duplicate parents in the selection process.
 
-**Crossover:** Pairs of parents are combined to produce a new child solution. A random square region is selected from one parent, and the routers within that region are copied to the other parent. The resulting child inherits characteristics from both parents.
+3. *Crossover*:
+   - Combine features of two parent solutions to create a child solution.
+   - Use a defined crossover region (e.g., a square) to determine which routers and paths are inherited from each parent.
+   - The crossover ensures that the child respects the problem's constraints and budget.
 
-**Mutation:** A mutation function is applied to the child solution, which can add, remove, or do nothing to the placement of routers. This introduces diversity into the population.
+4. *Mutation*:
+   - Apply random mutations to the child solution using the mutation_func function.
+   - Mutations include adding, removing, or doing nothing to routers, ensuring the changes respect the budget and constraints.
 
-**Replacement:** The children replace the old population, and the process repeats.
+5. *Evaluation*:
+   - Evaluate the fitness of the new individuals (children) and select the best solutions to form the next generation.
 
-The algorithm continues iterating until the <code>Space</code> key is pressed by the user. The best solution found during the process is returned as the final result.
+6. *Stopping Condition*:
+   - Stop when an external stop condition is triggered (e.g., pressing the space key).
+
+7. *Output*:
+   - Return the best solution found, its fitness score, the list of fitness values over generations, the number of iterations, and the total runtime.
+
+#### Key Features:
+- *Crossover and Mutation*: Introduce diversity to the population, enabling exploration of the solution space.
+- *Selection*: Ensures that better solutions are more likely to be passed on to the next generation.
+- *Fitness Tracking*: Continuously tracks and preserves the best solution found so far.
+- *Population Evolution*: The population evolves over generations toward an optimal map configuration within budget constraints.
+- *Flexible Stopping*: Can be stopped based on a custom condition.
 
 ## Parameterizations
 
