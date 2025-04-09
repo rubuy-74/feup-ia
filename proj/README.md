@@ -71,11 +71,64 @@ This function prioritizes the coverage over the price of the final solution. The
   + This approach allows the merge of the solutions with a limited amount of calculations for new paths, which simplifies the calculations. 
 
 ## Implemented Algorithms 
-### BFS - Breadth First Search
-### Greedy Solution (Naive Solution)
+
+### Naive Solution
+
+The Naive solution starts by placing a router in a random position that is not yet covered by any other router.
+
+It then connects that router to a backbone connection (which can either be a connected router, a connected cable, or the backbone itself). This connection is calculated using a breadth-first search (BFS), which leverages the main <code>ndarray</code> structure.
+
+After connecting the router, its path is accounted for in the solution budget, and the map's coverage is updated.
+
+At any time, if a router placement or a path creation surpasses the budget, the entire computation is reset, and another iteration starts.
+
+The algorithm continues running while there is still a budget available.
+
 ### HillClimb
+
+The HillClimb algorithm starts with an initial solution computed using the naive algorithm.
+
+At each iteration, a mutation is performed on the current solution. The mutation can be one of the following:
+
++ **Add:** A random router is added, and a BFS is performed to find the shortest path to a connected cell.
++ **Remove:** A random router is removed from the matrix. If the selected router is part of a straight cable, it is replaced by a cable. If it is isolated, its path to a straight cable is removed (using BFS).
++ **Nothing:** The mutation function does nothing to the current solution.
+Each operator respects the current remaining budget.
+
+After applying a mutation, the new solution is evaluated against the old one. If the new solution is better, it replaces the old one, and the budget is updated accordingly.
+
+The algorithm continues iterating until the <code>Space</code> key is pressed by the user.
+
 ### Simulated Annealing
+
+The Simulated Annealing algorithm starts with an initial solution computed using the naive algorithm. It explores the solution space by applying mutations and uses a probabilistic acceptance criterion to escape local optima.
+
+At each iteration:
+
+A mutation is applied to the current solution, which can add, remove, or do nothing to the placement of routers.
+
+The new solution is evaluated. If it is better than the current solution, it is accepted.
+If the new solution is worse, it may still be accepted with a probability proportional to the difference in scores (Δ) and the current temperature (T), calculated as <code>P = exp(Δ / T)</code>. This allows the algorithm to escape local optima.
+
+The temperature decreases over time according to a cooling schedule <code>(T = T * cooling_rate)</code>, and the algorithm stops when the temperature reaches a predefined threshold or until the <code>Space</code> key is pressed by the user.
+
+The algorithm tracks the best solution found during the process and returns it as the final result.
+
 ### Genetic Algorithm
+
+The Genetic Algorithm is a population-based optimization technique inspired by natural selection. It starts by creating an initial population of solutions using the naive algorithm (pre-computed for bigger maps).
+
+**Evaluation:** Each individual in the population is evaluated using the scoring function.
+
+**Selection:** A subset of the population is selected as parents based on their fitness scores. A tournament selection process is used to choose the best candidates, creating a pool of 3.
+
+**Crossover:** Pairs of parents are combined to produce a new child solution. A random square region is selected from one parent, and the routers within that region are copied to the other parent. The resulting child inherits characteristics from both parents.
+
+**Mutation:** A mutation function is applied to the child solution, which can add, remove, or do nothing to the placement of routers. This introduces diversity into the population.
+
+**Replacement:** The children replace the old population, and the process repeats.
+
+The algorithm continues iterating until the <code>Space</code> key is pressed by the user. The best solution found during the process is returned as the final result.
 
 ## Parameterizations
 
@@ -119,6 +172,7 @@ Routers have a limited range and cannot be placed in wall cells. Backbones in th
 + Score of the solution, computed using the formula above
 + Time spent on the algorithm execution
   + In the execution of the algorithms that need a initial solution, its computation time was not taking into account.
++ Number of iterations
 
 ### Data Structures
 
