@@ -6,7 +6,7 @@ This repository contains the implementation of various artificial intelligence a
 
 Rubem Neto      - up202207086 \
 Diogo Goiana    - up202207944 \
-Leandro Martins - up2022XXXXX 
+Leandro Martins - up202208001 \
 
 ## Project Overview
 
