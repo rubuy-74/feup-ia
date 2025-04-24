@@ -5,8 +5,8 @@ This repository contains the implementation of various artificial intelligence a
 ## Contributors
 
 Rubem Neto      - up202207086 \
-Diogo Goiana    - up2022XXXXX \
-Leandro Martins - up2022XXXXX 
+Diogo Goiana    - up202207944 \
+Leandro Martins - up202208001 \
 
 ## Project Overview
 
